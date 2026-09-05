@@ -1,0 +1,27 @@
+{
+  "name": "forja-v3",
+  "private": true,
+  "version": "3.0.0",
+  "type": "module",
+  "description": "FORJA 3.0 — hipertrofia, definición, running, postura y recuperación. Local, sin cuentas.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test pruebas/*.test.js",
+    "movil": "vite preview --host",
+    "iconos": "node scripts/generar-iconos.mjs",
+    "publicar": "bash scripts/publicar.sh"
+  },
+  "dependencies": {
+    "dexie": "^4.4.4",
+    "dexie-react-hooks": "^4.4.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.4",
+    "vite": "^8.2.0",
+    "vite-plugin-pwa": "^1.3.0"
+  }
+}

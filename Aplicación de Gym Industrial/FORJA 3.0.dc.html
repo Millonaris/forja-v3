@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/industry-68b21f85-1cc8-412c-9149-f4b4f9e948ef/styles.css">
+<script src="_ds/industry-68b21f85-1cc8-412c-9149-f4b4f9e948ef/_ds_bundle.js"></script>
+<style>
+html{background:#121214}body{margin:0;background:#121214;color:#F2F2EE;font-family:"Barlow",system-ui,sans-serif}
+a{color:#FFD400}a:hover{color:#FFE45C}
+</style>
+</helmet>
+<section id="t1" style="padding:40px 44px 48px;display:flex;flex-direction:column;gap:24px;scroll-margin-top:16px">
+  <div style="max-width:900px;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;align-items:baseline;gap:12px"><a href="#t1" style="font:600 11px ui-monospace,Menlo,monospace;padding:3px 7px;background:#FFD400;color:#0A0A0B;text-decoration:none">1</a><span style="font-family:'Barlow Condensed';font-weight:600;font-size:28px;letter-spacing:.02em">FORJA 3.0 — prototipo funcional · dos variantes de HOY</span></div>
+    <p style="margin:0;font-size:14px;color:#B5B5B0;line-height:1.5;max-width:760px"><strong style="color:#F2F2EE">Contexto:</strong> app personal local-first según la especificación del 05-09-2026. Fondo negro, un único acento amarillo (#FFD400), botones ≥52 px, Barlow Condensed para titulares, esquinas rectas con marcas de registro (gramática Industry con tokens invertidos). Los datos que registras <strong style="color:#F2F2EE">persisten</strong> y ambos teléfonos comparten la misma base — registra un peso en uno y aparece en el otro.</p>
+    <p style="margin:0;font-size:14px;color:#B5B5B0;line-height:1.5;max-width:760px"><strong style="color:#F2F2EE">Supuestos:</strong> hoy es pre-cut (día −3) → la cabecera dice “empieza en N días”; la secuencia de fuerza continúa desde la última sesión guardada; el CaCo sube de nivel tras 2 sesiones en verde; el semáforo nutricional queda en amarillo hasta tener ≥4 pesadas y ≥4 registros de recuperación en la semana. Usa el panel de Tweaks (fecha simulada) para ver el aviso del 16 nov y la pantalla de revisión del 30 nov.</p>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+    <div id="1a" style="display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px">
+      <div style="display:flex;align-items:baseline;gap:8px;font-size:12px;color:#B5B5B0"><a href="#1a" style="font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(255,255,255,.12);color:#F2F2EE;text-decoration:none">1a</a>HOY · <strong style="color:#F2F2EE">Panel</strong> — tarjetas independientes, cada dato con su propia acción</div>
+      <dc-import name="ForjaApp" variant="panel" hint-size="402px,874px"></dc-import>
+    </div>
+    <div id="1b" style="display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px">
+      <div style="display:flex;align-items:baseline;gap:8px;font-size:12px;color:#B5B5B0"><a href="#1b" style="font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(255,255,255,.12);color:#F2F2EE;text-decoration:none">1b</a>HOY · <strong style="color:#F2F2EE">Foco</strong> — un solo bloque amarillo con “lo que toca” y una lista de pendientes</div>
+      <dc-import name="ForjaApp" variant="foco" hint-size="402px,874px"></dc-import>
+    </div>
+  </div>
+  <p style="margin:0;font-size:12px;color:#8A8A86;line-height:1.5">Prueba: “quiero <a href="#1b" style="color:#FFD400">1b</a> pero con la tarjeta de nutrición de <a href="#1a" style="color:#FFD400">1a</a>” · “añade temporizador de descanso a la sesión en curso” · “pantalla de fotos de progreso”</p>
+</section>
+</x-dc>
+</body>
+</html>

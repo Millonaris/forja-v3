@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/industry-68b21f85-1cc8-412c-9149-f4b4f9e948ef/styles.css">
+<script src="_ds/industry-68b21f85-1cc8-412c-9149-f4b4f9e948ef/_ds_bundle.js"></script>
+<style>
+:root{--color-bg:#0A0A0B;--color-surface:#141416;--color-text:#F2F2EE;--color-accent:#FFD400;--color-accent-2:#FFD400;--color-divider:rgba(255,255,255,.16);--color-accent-100:#332B00;--color-accent-200:#4D4100;--color-accent-300:#806C00;--color-accent-400:#B39800;--color-accent-500:#FFD400;--color-accent-600:#E6BE00;--color-accent-700:#C9A600;--color-accent-800:#FFE45C;--color-accent-900:#FFF0A3;--color-neutral-100:#1C1C1E;--color-neutral-800:#D4D4D0;--shadow-sm:none;--shadow-md:none;--shadow-lg:0 12px 32px rgba(0,0,0,.6)}
+body{margin:0;background:#0A0A0B;color:#F2F2EE;font-family:"Barlow",system-ui,sans-serif}
+a{color:#FFD400}a:hover{color:#FFE45C}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+input[type=number]{-moz-appearance:textfield}
+.blueprint > .corner{color:rgba(255,212,0,.7)}
+@keyframes forjaIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+<div style="height:100%;display:flex;flex-direction:column;background:#0A0A0B;color:#F2F2EE;font-family:'Barlow',system-ui,sans-serif;font-size:15px;line-height:1.45;position:relative">
+
+<div style="flex:1;overflow:auto;padding:58px 18px 24px;display:flex;flex-direction:column;gap:18px;animation:forjaIn .25s ease-out">
+
+<!-- ============ HOY ============ -->
+<sc-if value="{{ isHoy }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px">
+    <div>
+      <div style="font-family:'Barlow Condensed';font-weight:600;font-size:40px;line-height:1;letter-spacing:.02em;color:#FFD400">FORJA</div>
+      <div style="font-family:'Barlow Condensed';font-weight:600;font-size:18px;letter-spacing:.1em;text-transform:uppercase;margin-top:6px">{{ phaseLabel }}</div>
+    </div>
+    <div style="text-align:right;font-size:12px;color:#9A9A96;line-height:1.35">Inicio 8 sep 2026<br>Revisión 30 nov 2026</div>
+  </div>
+  <p style="margin:-6px 0 0;font-size:15px;color:#C9C9C4">Objetivo actual: <strong style="color:#F2F2EE">perder grasa manteniendo músculo y rendimiento.</strong></p>
+
+  <sc-if value="{{ showAviso }}" hint-placeholder-val="{{ false }}">
+    <div style="position:relative;border:1px solid #FFD400;background:#FFD400;color:#0A0A0B;padding:14px 16px;display:flex;flex-direction:column;gap:4px">
+      <div style="font-family:'Barlow Condensed';font-weight:600;font-size:22px;letter-spacing:.04em;text-transform:uppercase">{{ avisoTitle }}</div>
+      <div style="font-size:13px">Peso · cintura · fotos · fuerza · hambre · energía · sueño</div>
+      <sc-if value="{{ isReviewDay }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ goReview }}" style="margin-top:8px;height:52px;background:#0A0A0B;color:#FFD400;border:0;font-family:'Barlow Condensed';font-weight:600;font-size:18px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Abrir revisión del cut</button>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- VARIANTE PANEL -->
+  <sc-if value="{{ isPanel }}" hint-placeholder-val="{{ true }}">
+    <div class="blueprint" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:18px 16px 16px;display:flex;flex-direction:column;gap:6px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FFD400">{{ mainKicker }}</div>
+      <div style="font-family:'Barlow Condensed';font-weight:600;font-size:46px;line-height:.95;text-transform:uppercase">{{ mainTitle }}</div>
+      <div style="font-size:14px;color:#C9C9C4">{{ mainSub }}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+        <sc-for list="{{ mainMeta }}" as="m" hint-placeholder-count="2"><span style="font-family:'Barlow Condensed';font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(255,255,255,.2);padding:3px 8px">{{ m }}</span></sc-for>
+      </div>
+      <button onClick="{{ mainAction }}" style="margin-top:12px;height:64px;width:100%;background:#FFD400;color:#0A0A0B;border:0;font-family:'Barlow Condensed';font-weight:600;font-size:22px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">{{ mainCta }}</button>
+      <sc-if value="{{ hasSecondary }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ secondaryAction }}" style="height:52px;width:100%;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:18px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">{{ secondaryCta }}</button>
+      </sc-if>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="blueprint" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:14px;display:flex;flex-direction:column;gap:4px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FFD400">Nutrición</div>
+        <div style="font-family:'Barlow Condensed';font-weight:600;font-size:36px;line-height:1">2.400 <span style="font-size:16px;color:#9A9A96">kcal</span></div>
+        <div style="font-size:13px;color:#C9C9C4;line-height:1.5">175 g proteína<br>268 g carbohidratos<br>70 g grasa</div>
+        <div style="font-size:12px;color:#9A9A96;margin-top:4px">Prioriza el total del día.</div>
+      </div>
+      <div class="blueprint" onClick="{{ openPeso }}" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:14px;display:flex;flex-direction:column;gap:4px;cursor:pointer"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FFD400">Peso de hoy</div>
+        <div style="font-family:'Barlow Condensed';font-weight:600;font-size:36px;line-height:1">{{ todayWeight }} <span style="font-size:16px;color:#9A9A96">kg</span></div>
+        <div style="font-size:13px;color:#C9C9C4;line-height:1.5">Media 7 días <strong style="color:#F2F2EE">{{ avg7 }}</strong><br>Semanal <strong style="color:#F2F2EE">{{ weeklyChange }}</strong></div>
+        <div style="margin-top:auto;font-family:'Barlow Condensed';font-weight:600;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:#FFD400">{{ pesoCta }} →</div>
+      </div>
+    </div>
+
+    <div class="blueprint" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:14px 16px;display:flex;flex-direction:column;gap:8px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FFD400">Recuperación</div>
+        <div style="font-size:12px;color:#9A9A96">{{ recupStatus }}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <sc-for list="{{ recupToday }}" as="r" hint-placeholder-count="4">
+          <div style="text-align:center"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:28px;line-height:1">{{ r.v }}</div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.06em">{{ r.k }}</div></div>
+        </sc-for>
+      </div>
+      <button onClick="{{ openRecup }}" style="height:52px;width:100%;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:18px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">{{ recupCta }}</button>
+      <div style="font-size:12px;color:#9A9A96">La recuperación importa tanto como la báscula.</div>
+    </div>
+
+    <div class="blueprint" onClick="{{ openCintura }}" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="flex:1">
+        <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FFD400">Cintura · semanal</div>
+        <div style="font-size:14px;color:#C9C9C4;margin-top:2px">{{ waistLine }}</div>
+      </div>
+      <div style="text-align:right"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:32px;line-height:1">{{ waistNow }}</div><div style="font-size:12px;color:#9A9A96">{{ waistDelta }}</div></div>
+    </div>
+    <div style="font-size:12px;color:#9A9A96;text-align:center">FORJA decide por tendencias, no por una pesada aislada.</div>
+  </sc-if>
+
+  <!-- VARIANTE FOCO -->
+  <sc-if value="{{ isFoco }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ mainAction }}" style="position:relative;background:#FFD400;color:#0A0A0B;padding:22px 18px 18px;display:flex;flex-direction:column;gap:4px;cursor:pointer;margin:0 -18px">
+      <div style="font-family:'Barlow Condensed';font-weight:600;font-size:13px;letter-spacing:.18em;text-transform:uppercase">{{ mainKicker }}</div>
+      <div style="font-family:'Barlow Condensed';font-weight:600;font-size:72px;line-height:.9;text-transform:uppercase;letter-spacing:-.01em">{{ mainTitle }}</div>
+      <div style="font-size:15px;font-weight:500;margin-top:6px">{{ mainSub }}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;border-top:1px solid rgba(0,0,0,.25);padding-top:12px">
+        <div style="font-family:'Barlow Condensed';font-weight:600;font-size:22px;letter-spacing:.06em;text-transform:uppercase">{{ mainCta }}</div>
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0A0A0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+      </div>
+    </div>
+    <sc-if value="{{ hasSecondary }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ secondaryAction }}" style="height:56px;width:100%;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:18px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">{{ secondaryCta }}</button>
+    </sc-if>
+    <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#9A9A96;margin-top:4px">Datos de hoy</div>
+    <div style="display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.16)">
+      <sc-for list="{{ checklist }}" as="c" hint-placeholder-count="4">
+        <div onClick="{{ c.on }}" style="display:flex;align-items:center;gap:14px;min-height:68px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.16);cursor:pointer">
+          <div style="width:14px;height:14px;border:1.5px solid #FFD400;background:{{ c.dot }};flex:none"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-family:'Barlow Condensed';font-weight:600;font-size:20px;letter-spacing:.04em;text-transform:uppercase;line-height:1.1">{{ c.title }}</div>
+            <div style="font-size:13px;color:#9A9A96">{{ c.sub }}</div>
+          </div>
+          <div style="font-family:'Barlow Condensed';font-weight:600;font-size:26px;line-height:1;text-align:right">{{ c.value }}<span style="font-size:13px;color:#9A9A96;margin-left:3px">{{ c.unit }}</span></div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-size:12px;color:#9A9A96;text-align:center">No necesitas clavar cada comida. Prioriza el total del día.</div>
+  </sc-if>
+</sc-if>
+
+<!-- ============ ENTRENAR ============ -->
+<sc-if value="{{ isEntMenu }}" hint-placeholder-val="{{ false }}">
+  <div style="font-family:'Barlow Condensed';font-weight:600;font-size:40px;line-height:1;text-transform:uppercase">Entrenar</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="blueprint" onClick="{{ goFuerza }}" style="position:relative;border:1px solid #FFD400;padding:16px 14px;min-height:130px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;background:rgba(255,212,0,.06)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FFD400" stroke-width="1.5" stroke-linecap="round"><path d="M2 12h3M19 12h3M5 8v8M19 8v8M8 6v12M16 6v12M8 12h8"></path></svg>
+      <div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:26px;line-height:1;text-transform:uppercase;color:#FFD400">Fuerza</div><div style="font-size:12px;color:#C9C9C4;margin-top:4px">Próxima: {{ nextName }}</div></div>
+    </div>
+    <div class="blueprint" onClick="{{ goRunning }}" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:16px 14px;min-height:130px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F2F2EE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20c4-1 5-6 8-8s5 1 10-4"></path><circle cx="18" cy="5" r="1.5"></circle></svg>
+      <div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:26px;line-height:1;text-transform:uppercase">Running</div><div style="font-size:12px;color:#C9C9C4;margin-top:4px">CaCo {{ cacoLabel }}</div></div>
+    </div>
+    <div class="blueprint" onClick="{{ goPostura }}" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:16px 14px;min-height:130px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F2F2EE" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="4" r="2"></circle><path d="M12 6v14M8 10h8M9 20h6"></path></svg>
+      <div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:26px;line-height:1;text-transform:uppercase">Postura</div><div style="font-size:12px;color:#C9C9C4;margin-top:4px">6 ejercicios · ~10 min</div></div>
+    </div>
+    <div class="blueprint" onClick="{{ goCore }}" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:16px 14px;min-height:130px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F2F2EE" stroke-width="1.5"><rect x="4" y="4" width="16" height="16"></rect><circle cx="12" cy="12" r="2.5"></circle></svg>
+      <div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:26px;line-height:1;text-transform:uppercase">Core</div><div style="font-size:12px;color:#C9C9C4;margin-top:4px">3 ejercicios · ~2×/semana</div></div>
+    </div>
+  </div>
+  <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#9A9A96">Secuencia de fuerza · sin días fijos</div>
+  <div style="display:flex;gap:6px">
+    <sc-for list="{{ seq }}" as="s" hint-placeholder-count="4">
+      <div onClick="{{ s.on }}" style="flex:1;text-align:center;padding:10px 4px;border:1px solid {{ s.border }};background:{{ s.bg }};color:{{ s.color }};font-family:'Barlow Condensed';font-weight:600;font-size:15px;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;line-height:1.1">{{ s.short }}<div style="font-size:10px;letter-spacing:.1em;opacity:.8">{{ s.state }}</div></div>
+    </sc-for>
+  </div>
+  <div style="font-size:12px;color:#9A9A96;text-align:center">Torso A → Pierna A → Torso B → Pierna B → repetir</div>
+</sc-if>
+
+<sc-if value="{{ isEntFuerza }}" hint-placeholder-val="{{ false }}">
+  <button onClick="{{ goEntMenu }}" style="align-self:flex-start;background:none;border:0;color:#FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:15px;letter-spacing:.08em;text-transform:uppercase;padding:0;cursor:pointer;min-height:44px">← Entrenar</button>
+  <div style="font-family:'Barlow Condensed';font-weight:600;font-size:40px;line-height:1;text-transform:uppercase;margin-top:-10px">Fuerza</div>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <sc-for list="{{ sessionList }}" as="s" hint-placeholder-count="4">
+      <div class="blueprint" onClick="{{ s.on }}" style="position:relative;border:1px solid {{ s.border }};padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div style="flex:1"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:26px;line-height:1;text-transform:uppercase">{{ s.name }}</div><div style="font-size:13px;color:#C9C9C4;margin-top:4px">{{ s.goal }}</div><div style="font-size:12px;color:#9A9A96;margin-top:2px">{{ s.last }}</div></div>
+        <div style="text-align:right"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ s.total }}</div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">series</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#FFD400;margin-top:4px">{{ s.state }}</div></div>
+      </div>
+    </sc-for>
+  </div>
+  <div class="blueprint" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:14px 16px;display:flex;flex-direction:column;gap:6px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FFD400">Doble progresión</div>
+    <div style="font-family:'Barlow Condensed';font-weight:600;font-size:22px;line-height:1.1">Primero ganas repeticiones. Después ganas peso.</div>
+    <div style="font-size:13px;color:#C9C9C4">3×8–12 · 10/9/8 → mantén · 12/12/12 con RIR correcto → sube carga. No exigir récord cada sesión. RIR 1–2 en todo.</div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ isEntSesion }}" hint-placeholder-val="{{ false }}">
+  <button onClick="{{ goFuerza }}" style="align-self:flex-start;background:none;border:0;color:#FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:15px;letter-spacing:.08em;text-transform:uppercase;padding:0;cursor:pointer;min-height:44px">← Fuerza</button>
+  <div style="margin-top:-10px">
+    <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FFD400">{{ selGoal }}</div>
+    <div style="font-family:'Barlow Condensed';font-weight:600;font-size:48px;line-height:.95;text-transform:uppercase">{{ selName }}</div>
+    <div style="font-size:13px;color:#9A9A96;margin-top:4px">{{ selTotal }} series · RIR 1–2 · {{ selDur }}</div>
+  </div>
+  <div style="display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.16)">
+    <sc-for list="{{ selExercises }}" as="e" hint-placeholder-count="8">
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.16)">
+        <div style="font-family:'Barlow Condensed';font-weight:600;font-size:16px;color:#9A9A96;width:22px">{{ e.n }}</div>
+        <div style="flex:1"><div style="font-size:15px;font-weight:500">{{ e.name }}</div><div style="font-size:12px;color:#9A9A96">{{ e.note }}</div></div>
+        <div style="text-align:right"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:22px;line-height:1">{{ e.scheme }}</div><div style="font-size:11px;color:#9A9A96">desc. {{ e.rest }}</div></div>
+      </div>
+    </sc-for>
+  </div>
+  <button onClick="{{ startLive }}" style="height:64px;width:100%;background:#FFD400;color:#0A0A0B;border:0;font-family:'Barlow Condensed';font-weight:600;font-size:22px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Empezar entrenamiento</button>
+</sc-if>
+
+<sc-if value="{{ isEntLive }}" hint-placeholder-val="{{ false }}">
+  <div style="position:sticky;top:-58px;margin:-58px -18px 0;padding:58px 18px 12px;background:#0A0A0B;z-index:5;border-bottom:1px solid rgba(255,255,255,.16)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end">
+      <div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FFD400">Sesión en curso</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:34px;line-height:1;text-transform:uppercase">{{ liveName }}</div></div>
+      <div style="text-align:right"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:34px;line-height:1">{{ liveDone }}<span style="color:#9A9A96;font-size:20px">/{{ liveTotal }}</span></div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">series</div></div>
+    </div>
+    <div style="height:4px;background:rgba(255,255,255,.12);margin-top:10px"><div style="height:100%;background:#FFD400;width:{{ livePct }}"></div></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <sc-for list="{{ liveEx }}" as="e" hint-placeholder-count="3">
+      <div class="blueprint" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:14px;display:flex;flex-direction:column;gap:8px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+          <div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:22px;line-height:1.05">{{ e.n }}. {{ e.name }}</div><div style="font-size:12px;color:#9A9A96">{{ e.scheme }} · desc. {{ e.rest }} · {{ e.note }}</div></div>
+          <div style="font-size:12px;color:#FFD400;white-space:nowrap">{{ e.last }}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:28px 1fr 1fr 64px;gap:8px;font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em"><div>#</div><div>kg</div><div>reps</div><div></div></div>
+        <sc-for list="{{ e.sets }}" as="s" hint-placeholder-count="3">
+          <div style="display:grid;grid-template-columns:28px 1fr 1fr 64px;gap:8px;align-items:center">
+            <div style="font-family:'Barlow Condensed';font-weight:600;font-size:18px;color:#9A9A96">{{ s.n }}</div>
+            <input type="number" inputmode="decimal" value="{{ s.kg }}" onChange="{{ s.setKg }}" placeholder="{{ s.hintKg }}" style="height:50px;width:100%;background:#141416;border:1px solid rgba(255,255,255,.16);color:#F2F2EE;font-family:'Barlow Condensed';font-weight:600;font-size:24px;text-align:center;outline:none">
+            <input type="number" inputmode="numeric" value="{{ s.reps }}" onChange="{{ s.setReps }}" placeholder="{{ s.hintReps }}" style="height:50px;width:100%;background:#141416;border:1px solid rgba(255,255,255,.16);color:#F2F2EE;font-family:'Barlow Condensed';font-weight:600;font-size:24px;text-align:center;outline:none">
+            <button onClick="{{ s.toggle }}" style="height:50px;border:1px solid #FFD400;background:{{ s.bg }};color:{{ s.color }};font-family:'Barlow Condensed';font-weight:600;font-size:16px;letter-spacing:.04em;cursor:pointer">{{ s.label }}</button>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:flex;gap:10px">
+    <button onClick="{{ cancelLive }}" style="flex:1;height:60px;background:transparent;color:#F2F2EE;border:1px solid rgba(255,255,255,.3);font-family:'Barlow Condensed';font-weight:600;font-size:18px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Cancelar</button>
+    <button onClick="{{ finishLive }}" style="flex:2;height:60px;background:#FFD400;color:#0A0A0B;border:0;font-family:'Barlow Condensed';font-weight:600;font-size:20px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Finalizar sesión</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ isEntRunning }}" hint-placeholder-val="{{ false }}">
+  <button onClick="{{ goEntMenu }}" style="align-self:flex-start;background:none;border:0;color:#FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:15px;letter-spacing:.08em;text-transform:uppercase;padding:0;cursor:pointer;min-height:44px">← Entrenar</button>
+  <div style="margin-top:-10px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:40px;line-height:1;text-transform:uppercase">Running</div><div style="font-size:13px;color:#9A9A96">Hobby complementario · 2 sesiones/semana · fácil (RPE 3–4)</div></div>
+  <div class="blueprint" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:16px;display:flex;flex-direction:column;gap:6px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FFD400">Sesión actual · CaCo</div>
+    <div style="font-family:'Barlow Condensed';font-weight:600;font-size:46px;line-height:.95">{{ cacoLabel }}</div>
+    <div style="font-size:14px;color:#C9C9C4">{{ cacoDesc }}</div>
+    <div style="font-size:13px;color:#9A9A96">{{ cacoProgressNote }}</div>
+    <button onClick="{{ openRun }}" style="margin-top:8px;height:60px;width:100%;background:#FFD400;color:#0A0A0B;border:0;font-family:'Barlow Condensed';font-weight:600;font-size:20px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Registrar sesión</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+    <div style="border-top:3px solid #5BE37D;padding-top:8px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:16px;text-transform:uppercase;letter-spacing:.06em;color:#5BE37D">Verde</div><div style="font-size:12px;color:#C9C9C4">0–2/10, pasajero.<br><strong>Continuar.</strong></div></div>
+    <div style="border-top:3px solid #FFD400;padding-top:8px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:16px;text-transform:uppercase;letter-spacing:.06em;color:#FFD400">Amarillo</div><div style="font-size:12px;color:#C9C9C4">Localizado, recurrente.<br><strong>No progresar.</strong></div></div>
+    <div style="border-top:3px solid #FF4D3D;padding-top:8px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:16px;text-transform:uppercase;letter-spacing:.06em;color:#FF4D3D">Rojo</div><div style="font-size:12px;color:#C9C9C4">Altera marcha, hinchazón.<br><strong>Parar y valorar.</strong></div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid rgba(255,255,255,.16)"><div style="width:12px;height:12px;background:{{ dolorColor }};flex:none"></div><div style="font-size:13px;color:#C9C9C4">{{ dolorText }}</div></div>
+  <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#9A9A96">Últimas sesiones</div>
+  <div style="display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.16)">
+    <sc-for list="{{ runsList }}" as="r" hint-placeholder-count="3">
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.16)">
+        <div style="width:56px;font-size:12px;color:#9A9A96">{{ r.date }}</div>
+        <div style="flex:1"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:20px;line-height:1">{{ r.label }}</div><div style="font-size:12px;color:#9A9A96">{{ r.detail }}</div></div>
+        <div style="text-align:right;font-size:12px;color:#C9C9C4">FC {{ r.fc }}<br>dolor {{ r.dolor }}/10</div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="font-size:12px;color:#9A9A96">El objetivo de 20 km no tiene fecha límite. Mantén esta sesión hasta que deje de interferir con fuerza y recuperación.</div>
+</sc-if>
+
+<sc-if value="{{ isEntRutina }}" hint-placeholder-val="{{ false }}">
+  <button onClick="{{ goEntMenu }}" style="align-self:flex-start;background:none;border:0;color:#FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:15px;letter-spacing:.08em;text-transform:uppercase;padding:0;cursor:pointer;min-height:44px">← Entrenar</button>
+  <div style="margin-top:-10px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:40px;line-height:1;text-transform:uppercase">{{ rutinaName }}</div><div style="font-size:13px;color:#9A9A96">{{ rutinaSub }}</div></div>
+  <div style="display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.16)">
+    <sc-for list="{{ rutinaItems }}" as="i" hint-placeholder-count="5">
+      <div onClick="{{ i.on }}" style="display:flex;align-items:center;gap:14px;min-height:64px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.16);cursor:pointer">
+        <div style="width:26px;height:26px;border:1.5px solid #FFD400;background:{{ i.bg }};flex:none;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg></div>
+        <div style="flex:1;font-size:16px;font-weight:500;opacity:{{ i.op }}">{{ i.name }}</div>
+        <div style="font-family:'Barlow Condensed';font-weight:600;font-size:20px">{{ i.scheme }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="font-size:13px;color:#C9C9C4;border-left:0;padding:0">{{ rutinaCue }}</div>
+  <button onClick="{{ finishRutina }}" style="height:60px;width:100%;background:#FFD400;color:#0A0A0B;border:0;font-family:'Barlow Condensed';font-weight:600;font-size:20px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Completar rutina</button>
+</sc-if>
+
+<!-- ============ PROGRESO ============ -->
+<sc-if value="{{ isProgreso }}" hint-placeholder-val="{{ false }}">
+  <div style="font-family:'Barlow Condensed';font-weight:600;font-size:40px;line-height:1;text-transform:uppercase">Progreso</div>
+  <div style="display:flex;border:1px solid rgba(255,255,255,.2)">
+    <sc-for list="{{ progTabs }}" as="t" hint-placeholder-count="4">
+      <div onClick="{{ t.on }}" style="flex:1;text-align:center;height:48px;display:flex;align-items:center;justify-content:center;background:{{ t.bg }};color:{{ t.color }};font-family:'Barlow Condensed';font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-left:1px solid rgba(255,255,255,.2)">{{ t.label }}</div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ isProgCuerpo }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Media 7 d</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ avg7 }}</div></div>
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Semanal</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ weeklyChange }}</div></div>
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Tendencia</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:18px;line-height:1.1;margin-top:6px;color:#FFD400">{{ trendLabel }}</div></div>
+    </div>
+    <div class="blueprint" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:14px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em"><span>Peso · últimos {{ chartDays }} días</span><span>{{ chartRange }}</span></div>
+      <svg viewBox="0 0 330 130" width="100%" style="display:block;margin-top:8px;overflow:visible">
+        <line x1="0" y1="129" x2="330" y2="129" stroke="rgba(255,255,255,.2)"></line>
+        <path d="{{ weightPath }}" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linejoin="round"></path>
+        <path d="{{ avgPath }}" fill="none" stroke="#FFD400" stroke-width="2.5" stroke-linejoin="round"></path>
+        <sc-for list="{{ weightDots }}" as="d" hint-placeholder-count="0"><circle cx="{{ d.x }}" cy="{{ d.y }}" r="2.5" fill="#F2F2EE"></circle></sc-for>
+      </svg>
+      <div style="display:flex;gap:14px;font-size:11px;color:#9A9A96;margin-top:8px"><span><span style="display:inline-block;width:10px;height:2px;background:#FFD400;vertical-align:middle;margin-right:4px"></span>media 7 días</span><span><span style="display:inline-block;width:10px;height:2px;background:rgba(255,255,255,.35);vertical-align:middle;margin-right:4px"></span>pesada diaria</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="blueprint" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:14px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Cintura</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ waistNow }}</div><div style="font-size:12px;color:#C9C9C4">{{ waistDelta }}</div></div>
+      <div class="blueprint" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:14px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Pasos medios</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">12.800</div><div style="font-size:12px;color:#C9C9C4">indicador de actividad, no kcal</div></div>
+    </div>
+    <div class="blueprint" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:14px;display:flex;justify-content:space-between;align-items:center"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Fotos · cada 4 semanas</div><div style="font-size:14px;color:#C9C9C4">Frente · lado · espalda · misma luz</div></div>
+      <div style="font-family:'Barlow Condensed';font-weight:600;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:#FFD400">Próximas 6 oct</div>
+    </div>
+    <div style="font-size:12px;color:#9A9A96;text-align:center">{{ weightMessage }}</div>
+  </sc-if>
+
+  <sc-if value="{{ isProgFuerza }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Sesiones</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ strengthCount }}</div></div>
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Series</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ strengthSets }}</div></div>
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Volumen</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ strengthVol }}<span style="font-size:14px;color:#9A9A96"> kg</span></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.16)">
+      <div style="display:grid;grid-template-columns:1fr 64px 70px;gap:8px;padding:8px 0;font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid rgba(255,255,255,.16)"><div>Ejercicio</div><div style="text-align:right">Última</div><div style="text-align:right">Mejor serie</div></div>
+      <sc-for list="{{ exProgress }}" as="e" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:1fr 64px 70px;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.16);align-items:center">
+          <div><div style="font-size:14px;font-weight:500">{{ e.name }}</div><div style="font-size:11px;color:#9A9A96">{{ e.sessions }}</div></div>
+          <div style="text-align:right;font-family:'Barlow Condensed';font-weight:600;font-size:20px">{{ e.last }}</div>
+          <div style="text-align:right;font-family:'Barlow Condensed';font-weight:600;font-size:20px;color:#FFD400">{{ e.best }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-size:12px;color:#9A9A96;text-align:center">Primero ganas repeticiones. Después ganas peso.</div>
+  </sc-if>
+
+  <sc-if value="{{ isProgRunning }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Nivel CaCo</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ cacoLabel }}</div></div>
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Sesiones/sem</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ runsPerWeek }}</div></div>
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">FC media</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ runFcAvg }}</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.16)">
+      <sc-for list="{{ runsList }}" as="r" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.16)">
+          <div style="width:10px;height:10px;background:{{ r.color }};flex:none"></div>
+          <div style="width:52px;font-size:12px;color:#9A9A96">{{ r.date }}</div>
+          <div style="flex:1"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:20px;line-height:1">{{ r.label }}</div><div style="font-size:12px;color:#9A9A96">{{ r.detail }}</div></div>
+          <div style="text-align:right;font-size:12px;color:#C9C9C4">FC {{ r.fc }}<br>sens. {{ r.sens }}/5</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-size:12px;color:#9A9A96;text-align:center">Los datos recientes no prueban mejora fisiológica por sí solos.</div>
+  </sc-if>
+
+  <sc-if value="{{ isProgRecup }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Hambre 7 d</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ avgHambre }}<span style="font-size:14px;color:#9A9A96">/5</span></div></div>
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Energía 7 d</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ avgEnergia }}<span style="font-size:14px;color:#9A9A96">/5</span></div></div>
+      <div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em">Sueño 7 d</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1">{{ avgSueno }}<span style="font-size:14px;color:#9A9A96"> h</span></div></div>
+    </div>
+    <div class="blueprint" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:14px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Últimos 7 registros</div>
+      <div style="display:flex;gap:6px;align-items:flex-end;height:110px">
+        <sc-for list="{{ recupBars }}" as="b" hint-placeholder-count="7">
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;height:100%">
+            <div style="display:flex;gap:2px;align-items:flex-end;flex:1">
+              <div style="flex:1;background:#FFD400;height:{{ b.h }}"></div>
+              <div style="flex:1;background:rgba(255,255,255,.45);height:{{ b.e }}"></div>
+              <div style="flex:1;background:rgba(255,212,0,.35);height:{{ b.s }}"></div>
+            </div>
+            <div style="font-size:10px;color:#9A9A96;text-align:center">{{ b.d }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:12px;font-size:11px;color:#9A9A96;margin-top:8px"><span><span style="display:inline-block;width:8px;height:8px;background:#FFD400;margin-right:4px"></span>hambre</span><span><span style="display:inline-block;width:8px;height:8px;background:rgba(255,255,255,.45);margin-right:4px"></span>energía</span><span><span style="display:inline-block;width:8px;height:8px;background:rgba(255,212,0,.35);margin-right:4px"></span>sueño</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid rgba(255,255,255,.16)"><div style="width:12px;height:12px;background:{{ semColor }};flex:none"></div><div style="font-size:13px;color:#C9C9C4"><strong style="color:#F2F2EE">Semáforo nutricional: {{ semLabel }}.</strong> {{ semText }}</div></div>
+    <sc-if value="{{ suggestDeload }}" hint-placeholder-val="{{ false }}">
+      <div style="border:1px solid #FFD400;padding:12px 14px;font-size:13px"><strong>Parece que acumulas fatiga.</strong> Puede ser buen momento para reducir volumen temporalmente. FORJA no lo hace sin tu confirmación.</div>
+    </sc-if>
+  </sc-if>
+</sc-if>
+
+<!-- ============ PLAN ============ -->
+<sc-if value="{{ isPlan }}" hint-placeholder-val="{{ false }}">
+  <div style="font-family:'Barlow Condensed';font-weight:600;font-size:40px;line-height:1;text-transform:uppercase">Plan</div>
+  <div class="blueprint" style="position:relative;border:1px solid #FFD400;padding:16px;display:flex;flex-direction:column;gap:8px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FFD400">Fase actual · ~12 semanas</div>
+    <div style="font-family:'Barlow Condensed';font-weight:600;font-size:52px;line-height:.95;text-transform:uppercase">Definición</div>
+    <div style="font-size:14px;color:#C9C9C4">Verse claramente más definido manteniendo el máximo músculo y rendimiento posible. Ritmo orientativo ~0,4–0,6 kg/semana.</div>
+    <div style="height:6px;background:rgba(255,255,255,.12);margin-top:6px;position:relative"><div style="height:100%;background:#FFD400;width:{{ cutPct }}"></div><div style="position:absolute;top:-3px;left:82%;width:2px;height:12px;background:#F2F2EE"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.06em"><span>8 sep · inicio</span><span>16 nov · aviso</span><span>30 nov · revisión</span></div>
+  </div>
+  <div class="blueprint" style="position:relative;border:1px solid rgba(255,255,255,.16);padding:16px;display:flex;flex-direction:column;gap:8px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FFD400">Dieta del cut</div><div style="font-size:12px;color:#9A9A96">Objetivo diario, no examen</div></div>
+    <div style="font-family:'Barlow Condensed';font-weight:600;font-size:46px;line-height:1">2.400 <span style="font-size:18px;color:#9A9A96">kcal/día</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+      <div style="border:1px solid rgba(255,255,255,.16);padding:10px 4px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:28px;line-height:1">175<span style="font-size:14px;color:#9A9A96"> g</span></div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.06em">proteína</div><div style="font-size:11px;color:#C9C9C4">165–180 ok</div></div>
+      <div style="border:1px solid rgba(255,255,255,.16);padding:10px 4px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:28px;line-height:1">268<span style="font-size:14px;color:#9A9A96"> g</span></div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.06em">carbos</div><div style="font-size:11px;color:#C9C9C4">ajusta el resto</div></div>
+      <div style="border:1px solid rgba(255,255,255,.16);padding:10px 4px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:28px;line-height:1">70<span style="font-size:14px;color:#9A9A96"> g</span></div><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.06em">grasa</div><div style="font-size:11px;color:#C9C9C4">cerca</div></div>
+    </div>
+    <div style="font-size:13px;color:#C9C9C4">Mismo objetivo todos los días. No se añaden kcal por gym o CaCo. No se comen “las calorías del Garmin”.</div>
+  </div>
+  <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#9A9A96">Reparto habitual</div>
+  <div style="display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.16)">
+    <div style="display:flex;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.16)"><div style="width:90px;font-family:'Barlow Condensed';font-weight:600;font-size:18px">09:00–09:30</div><div style="font-size:14px">Desayuno</div></div>
+    <div style="display:flex;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.16)"><div style="width:90px;font-family:'Barlow Condensed';font-weight:600;font-size:18px;color:#FFD400">~12:00</div><div style="font-size:14px;color:#FFD400">Gym</div></div>
+    <div style="display:flex;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.16)"><div style="width:90px;font-family:'Barlow Condensed';font-weight:600;font-size:18px">13:00–13:30</div><div style="font-size:14px">Comida post-entreno</div></div>
+    <div style="display:flex;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.16)"><div style="width:90px;font-family:'Barlow Condensed';font-weight:600;font-size:18px">17:00–18:00</div><div style="font-size:14px">Merienda</div></div>
+    <div style="display:flex;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.16)"><div style="width:90px;font-family:'Barlow Condensed';font-weight:600;font-size:18px">~21:00</div><div style="font-size:14px">Cena</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+    <div style="border:1px solid rgba(255,255,255,.16);padding:10px"><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.06em">Líquidos</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:22px;line-height:1.1">2,5–3 L</div></div>
+    <div style="border:1px solid rgba(255,255,255,.16);padding:10px"><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.06em">Creatina</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:22px;line-height:1.1">5 g/día</div></div>
+    <div style="border:1px solid rgba(255,255,255,.16);padding:10px"><div style="font-size:11px;color:#9A9A96;text-transform:uppercase;letter-spacing:.06em">Whey · cafeína</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:22px;line-height:1.1">opcional</div></div>
+  </div>
+  <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#9A9A96">Reglas de decisión</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="border:1px solid rgba(255,255,255,.16);padding:12px 14px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:18px">Tendencias, no pesadas</div><div style="font-size:13px;color:#C9C9C4">Nunca se cambian kcal por un día. Sin datos suficientes, FORJA no ajusta el plan.</div></div>
+    <div style="border:1px solid rgba(255,255,255,.16);padding:12px 14px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:18px">Hipertrofia manda sobre running</div><div style="font-size:13px;color:#C9C9C4">Si el running interfiere con piernas, fuerza o recuperación, se congela su progresión.</div></div>
+    <div style="border:1px solid rgba(255,255,255,.16);padding:12px 14px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:18px">Descargas por señales, no por calendario</div><div style="font-size:13px;color:#C9C9C4">Regresión repetida, fatiga, sueño peor o molestias → FORJA sugiere; tú confirmas.</div></div>
+    <div style="border:1px solid rgba(255,255,255,.16);padding:12px 14px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:18px">Comidas sociales</div><div style="font-size:13px;color:#C9C9C4">Reducen el déficit semanal, no arruinan el proceso. Sin ayuno punitivo ni cardio de castigo.</div></div>
+  </div>
+  <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#9A9A96">Después del cut</div>
+  <div style="display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.16)">
+    <div style="display:flex;gap:14px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.16);align-items:center"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:22px;color:#FFD400;width:26px">1</div><div style="flex:1"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:18px;text-transform:uppercase">Mantenimiento</div><div style="font-size:12px;color:#9A9A96">Estabilizar el nuevo peso · ~2–3 semanas, ampliable</div></div></div>
+    <div style="display:flex;gap:14px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.16);align-items:center"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:22px;color:#FFD400;width:26px">2</div><div style="flex:1"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:18px;text-transform:uppercase">Ganancia muscular</div><div style="font-size:12px;color:#9A9A96">+150–200 kcal/día · ~0,25–0,45 kg/mes</div></div></div>
+    <div style="display:flex;gap:14px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.16);align-items:center"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:22px;color:#FFD400;width:26px">3</div><div style="flex:1"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:18px;text-transform:uppercase">Mini-cut (solo si hace falta)</div><div style="font-size:12px;color:#9A9A96">Si la cintura sube demasiado o se pierde definición</div></div></div>
+  </div>
+  <button onClick="{{ goReview }}" style="height:56px;width:100%;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:18px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Ver pantalla de revisión (30 nov)</button>
+</sc-if>
+
+<!-- ============ REVISIÓN DEL CUT ============ -->
+<sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+  <button onClick="{{ goPlan }}" style="align-self:flex-start;background:none;border:0;color:#FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:15px;letter-spacing:.08em;text-transform:uppercase;padding:0;cursor:pointer;min-height:44px">← Plan</button>
+  <div style="margin-top:-10px"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FFD400">Revisión del cut · 30 nov 2026</div><div style="font-family:'Barlow Condensed';font-weight:600;font-size:52px;line-height:.95;text-transform:uppercase">¿Qué ha pasado?</div></div>
+  <div style="display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.16)">
+    <sc-for list="{{ reviewRows }}" as="r" hint-placeholder-count="6">
+      <div style="display:grid;grid-template-columns:1fr 70px 70px 70px;gap:6px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.16);align-items:center">
+        <div style="font-size:14px;font-weight:500">{{ r.k }}</div>
+        <div style="text-align:right;font-family:'Barlow Condensed';font-weight:600;font-size:18px;color:#9A9A96">{{ r.a }}</div>
+        <div style="text-align:right;font-family:'Barlow Condensed';font-weight:600;font-size:18px">{{ r.b }}</div>
+        <div style="text-align:right;font-family:'Barlow Condensed';font-weight:600;font-size:18px;color:#FFD400">{{ r.d }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="font-size:12px;color:#9A9A96">Columnas: inicio · ahora · cambio. Fotos y rendimiento se valoran a mano; la fecha es una revisión obligatoria, no una orden automática.</div>
+  <div style="font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#9A9A96">Decisión</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <sc-for list="{{ decisions }}" as="d" hint-placeholder-count="3">
+      <button onClick="{{ d.on }}" style="min-height:64px;width:100%;text-align:left;padding:12px 16px;background:{{ d.bg }};color:{{ d.color }};border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:20px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px"><span>{{ d.label }}</span><span style="font-size:14px;opacity:.7">{{ d.k }}</span></button>
+    </sc-for>
+  </div>
+</sc-if>
+
+</div>
+
+<!-- ============ TAB BAR ============ -->
+<div style="display:flex;border-top:1px solid rgba(255,255,255,.16);background:#0A0A0B;padding-bottom:22px;flex:none">
+  <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+    <div onClick="{{ t.on }}" style="flex:1;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:{{ t.color }};border-top:3px solid {{ t.bar }};margin-top:-1px">
+      <div style="font-family:'Barlow Condensed';font-weight:600;font-size:22px;line-height:1">{{ t.glyph }}</div>
+      <div style="font-family:'Barlow Condensed';font-weight:600;font-size:13px;letter-spacing:.12em;text-transform:uppercase">{{ t.label }}</div>
+    </div>
+  </sc-for>
+</div>
+
+<!-- ============ MODAL ============ -->
+<sc-if value="{{ hasModal }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeModal }}" style="position:absolute;inset:0;background:rgba(0,0,0,.7);z-index:40"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;z-index:41;background:#141416;border-top:2px solid #FFD400;padding:20px 18px 40px;display:flex;flex-direction:column;gap:14px;animation:forjaIn .22s ease-out">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-family:'Barlow Condensed';font-weight:600;font-size:30px;line-height:1;text-transform:uppercase">{{ modalTitle }}</div><div style="font-size:12px;color:#9A9A96">{{ modalSub }}</div></div>
+
+    <sc-if value="{{ isModalPeso }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onClick="{{ kgMinus }}" style="width:64px;height:64px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:30px;cursor:pointer">−</button>
+        <input type="number" step="0.1" inputmode="decimal" value="{{ formKg }}" onChange="{{ setKg }}" style="flex:1;height:64px;background:#0A0A0B;border:1px solid rgba(255,255,255,.16);color:#F2F2EE;font-family:'Barlow Condensed';font-weight:600;font-size:40px;text-align:center;outline:none">
+        <button onClick="{{ kgPlus }}" style="width:64px;height:64px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:30px;cursor:pointer">+</button>
+      </div>
+      <div onClick="{{ toggleDudosa }}" style="display:flex;align-items:center;gap:12px;min-height:48px;cursor:pointer"><div style="width:22px;height:22px;border:1.5px solid #FFD400;background:{{ dudosaBg }};flex:none"></div><div style="font-size:14px">Marcar como <strong>PESADA DUDOSA</strong> (condiciones distintas)</div></div>
+      <div style="font-size:12px;color:#9A9A96">Mañana · tras orinar · antes de comer · misma báscula y posición. Si dudas, repite 2–3 veces.</div>
+    </sc-if>
+
+    <sc-if value="{{ isModalCintura }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onClick="{{ cmMinus }}" style="width:64px;height:64px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:30px;cursor:pointer">−</button>
+        <input type="number" step="0.5" inputmode="decimal" value="{{ formCm }}" onChange="{{ setCm }}" style="flex:1;height:64px;background:#0A0A0B;border:1px solid rgba(255,255,255,.16);color:#F2F2EE;font-family:'Barlow Condensed';font-weight:600;font-size:40px;text-align:center;outline:none">
+        <button onClick="{{ cmPlus }}" style="width:64px;height:64px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:30px;cursor:pointer">+</button>
+      </div>
+      <div style="font-size:12px;color:#9A9A96">Mañana · ayunas · ombligo · relajado · fin de espiración normal · 2 medidas, usa la media.</div>
+    </sc-if>
+
+    <sc-if value="{{ isModalRecup }}" hint-placeholder-val="{{ false }}">
+      <div><div style="font-size:12px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Hambre</div><div style="display:flex;gap:6px"><sc-for list="{{ hambreScale }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.on }}" style="flex:1;height:52px;border:1px solid #FFD400;background:{{ o.bg }};color:{{ o.color }};font-family:'Barlow Condensed';font-weight:600;font-size:22px;cursor:pointer">{{ o.v }}</button></sc-for></div></div>
+      <div><div style="font-size:12px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Energía</div><div style="display:flex;gap:6px"><sc-for list="{{ energiaScale }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.on }}" style="flex:1;height:52px;border:1px solid #FFD400;background:{{ o.bg }};color:{{ o.color }};font-family:'Barlow Condensed';font-weight:600;font-size:22px;cursor:pointer">{{ o.v }}</button></sc-for></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div style="font-size:12px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Horas de sueño</div><div style="display:flex;align-items:center;gap:6px"><button onClick="{{ hMinus }}" style="width:48px;height:52px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:24px;cursor:pointer">−</button><div style="flex:1;height:52px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.16);font-family:'Barlow Condensed';font-weight:600;font-size:26px">{{ formHoras }}</div><button onClick="{{ hPlus }}" style="width:48px;height:52px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:24px;cursor:pointer">+</button></div></div>
+        <div><div style="font-size:12px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Calidad</div><div style="display:flex;gap:4px"><sc-for list="{{ calidadScale }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.on }}" style="flex:1;height:52px;border:1px solid #FFD400;background:{{ o.bg }};color:{{ o.color }};font-family:'Barlow Condensed';font-weight:600;font-size:18px;cursor:pointer;padding:0">{{ o.v }}</button></sc-for></div></div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isModalRun }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div style="font-size:12px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Min corriendo</div><div style="display:flex;align-items:center;gap:6px"><button onClick="{{ runMinus }}" style="width:48px;height:52px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:24px;cursor:pointer">−</button><div style="flex:1;height:52px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.16);font-family:'Barlow Condensed';font-weight:600;font-size:26px">{{ formRunMin }}</div><button onClick="{{ runPlus }}" style="width:48px;height:52px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:24px;cursor:pointer">+</button></div></div>
+        <div><div style="font-size:12px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Min andando</div><div style="display:flex;align-items:center;gap:6px"><button onClick="{{ walkMinus }}" style="width:48px;height:52px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:24px;cursor:pointer">−</button><div style="flex:1;height:52px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.16);font-family:'Barlow Condensed';font-weight:600;font-size:26px">{{ formWalkMin }}</div><button onClick="{{ walkPlus }}" style="width:48px;height:52px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:24px;cursor:pointer">+</button></div></div>
+        <div><div style="font-size:12px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">FC media</div><div style="display:flex;align-items:center;gap:6px"><button onClick="{{ fcMinus }}" style="width:48px;height:52px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:24px;cursor:pointer">−</button><div style="flex:1;height:52px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.16);font-family:'Barlow Condensed';font-weight:600;font-size:26px">{{ formFc }}</div><button onClick="{{ fcPlus }}" style="width:48px;height:52px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:24px;cursor:pointer">+</button></div></div>
+        <div><div style="font-size:12px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Dolor 0–10</div><div style="display:flex;align-items:center;gap:6px"><button onClick="{{ dolMinus }}" style="width:48px;height:52px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:24px;cursor:pointer">−</button><div style="flex:1;height:52px;display:flex;align-items:center;justify-content:center;border:1px solid {{ formDolorColor }};color:{{ formDolorColor }};font-family:'Barlow Condensed';font-weight:600;font-size:26px">{{ formDolor }}</div><button onClick="{{ dolPlus }}" style="width:48px;height:52px;background:transparent;color:#FFD400;border:1px solid #FFD400;font-family:'Barlow Condensed';font-weight:600;font-size:24px;cursor:pointer">+</button></div></div>
+      </div>
+      <div><div style="font-size:12px;color:#9A9A96;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Sensación</div><div style="display:flex;gap:6px"><sc-for list="{{ sensScale }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.on }}" style="flex:1;height:52px;border:1px solid #FFD400;background:{{ o.bg }};color:{{ o.color }};font-family:'Barlow Condensed';font-weight:600;font-size:22px;cursor:pointer">{{ o.v }}</button></sc-for></div></div>
+    </sc-if>
+
+    <button onClick="{{ saveModal }}" style="height:60px;width:100%;background:#FFD400;color:#0A0A0B;border:0;font-family:'Barlow Condensed';font-weight:600;font-size:20px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Guardar</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;left:18px;right:18px;bottom:110px;z-index:45;background:#FFD400;color:#0A0A0B;padding:12px 16px;font-family:'Barlow Condensed';font-weight:600;font-size:17px;letter-spacing:.03em;animation:forjaIn .2s ease-out">{{ toast }}</div>
+</sc-if>
+
+</div>
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:402,&quot;height&quot;:874},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;panel&quot;,&quot;foco&quot;],&quot;default&quot;:&quot;panel&quot;,&quot;tsType&quot;:&quot;'panel' | 'foco'&quot;,&quot;section&quot;:&quot;Pantalla HOY&quot;},&quot;fechaSimulada&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hoy&quot;,&quot;día 20 del cut&quot;,&quot;16 nov (aviso)&quot;,&quot;30 nov (revisión)&quot;],&quot;default&quot;:&quot;hoy&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Simulación&quot;}}">
+const KEY = 'forja3.v1';
+const SEQ = ['TA', 'PA', 'TB', 'PB'];
+// [nombre, series, reps, descanso, nota]
+const EX = {
+  TA: { name: 'TORSO A', short: 'Torso A', goal: 'Dorsal / anchura + hombro lateral', muscles: 'Dorsal · hombro lateral · pecho · brazos', dur: '~60 min', ex: [
+    ['Jalón al pecho prono', 3, '8–12', '2:00', 'RIR 1–2'], ['Remo sentado máquina agarre bajo', 3, '8–12', '2:00', 'sesgo dorsal'], ['Elevaciones laterales', 4, '12–20', '1:15', 'RIR 1–2'], ['Press inclinado máquina', 3, '8–12', '2:30', 'RIR 1–2'], ['Reverse pec deck', 2, '12–20', '1:15', 'RIR 1–2'], ['Press hombro máquina', 2, '8–12', '2:00', 'RIR 1–2'], ['Curl bíceps', 2, '10–15', '1:30', 'RIR 1–2'], ['Tríceps polea', 2, '10–15', '1:30', 'RIR 1–2']] },
+  PA: { name: 'PIERNA A', short: 'Pierna A', goal: 'Cuádriceps + glúteo + femoral + pantorrilla', muscles: 'Cuádriceps · glúteo · femoral · pantorrilla', dur: '~55–65 min', ex: [
+    ['Hack squat', 3, '8–12', '2:30', 'RIR 1–2'], ['Hip thrust', 3, '8–12', '2:00', 'RIR 1–2'], ['Prensa', 2, '10–15', '2:00', 'RIR 1–2'], ['Curl femoral sentado', 3, '10–15', '1:30', 'RIR 1–2'], ['Extensión cuádriceps', 2, '10–15', '1:15', 'Superserie A'], ['Elevaciones laterales', 2, '12–20', '1:15', 'Superserie A'], ['Gemelo de pie', 2, '10–20', '1:00', 'Superserie B'], ['Pullover', 2, '10–15', '1:00', 'Superserie B'], ['Sóleo sentado', 2, '12–20', '1:00', 'Superserie C'], ['Tibial anterior', 2, '15–20', '1:00', 'Superserie C']] },
+  TB: { name: 'TORSO B', short: 'Torso B', goal: 'Hombro + espalda alta + pecho', muscles: 'Hombro · espalda alta · pecho · brazos', dur: '~60 min', ex: [
+    ['Elevaciones laterales', 4, '12–20', '1:15', 'RIR 1–2'], ['Remo sentado máquina agarre alto', 3, '8–12', '2:00', 'espalda alta / posterior'], ['Jalón neutro/medio', 3, '8–12', '2:00', 'RIR 1–2'], ['Press plano máquina', 3, '8–12', '2:30', 'RIR 1–2'], ['Reverse pec deck', 2, '12–20', '1:15', 'RIR 1–2'], ['Pec deck', 2, '10–15', '1:30', 'RIR 1–2'], ['Curl bíceps', 2, '10–15', '1:30', 'RIR 1–2'], ['Tríceps overhead cable', 2, '10–15', '1:30', 'RIR 1–2']] },
+  PB: { name: 'PIERNA B', short: 'Pierna B', goal: 'Glúteo + femoral + pierna posterior', muscles: 'Glúteo · femoral · pierna posterior', dur: '~55 min', ex: [
+    ['Hip thrust', 3, '8–12', '2:00', 'RIR 1–2'], ['Prensa sesgo glúteo', 3, '8–12', '2:30', 'RIR 1–2'], ['Curl femoral', 3, '10–15', '1:30', 'RIR 1–2'], ['Extensión lumbar 45° sesgo glúteo', 2, '10–15', '1:30', 'RIR 1–2'], ['Abductora', 2, '15–25', '1:00', 'Superserie'], ['Elevaciones laterales', 2, '12–20', '1:00', 'Superserie'], ['Pullover', 2, '10–15', '1:15', 'RIR 1–2'], ['Sóleo', 2, '12–20', '1:00', 'Superserie final'], ['Tibial anterior', 2, '15–20', '1:00', 'Superserie final']] },
+};
+const RUTINAS = {
+  postura: { name: 'Postura', sub: 'Control cervical · movilidad torácica · costillas sobre pelvis', cue: 'Cue: Rodillas suaves → costillas sobre pelvis → cuello largo. Mini-reset 3–5 veces al día, 10–20 s.', items: [['Pelvic tilt', '1×8'], ['Extensión torácica con foam roller', '1×8'], ['Chin tuck', '2×8 · 5 s'], ['Wall slide', '2×8–10'], ['Low cobra', '2×20–30 s'], ['Standing stack', '3×20 s']] },
+  core: { name: 'Core', sub: '~2 veces/semana · 3 ejercicios', cue: 'Sin fallo ni técnicas avanzadas. Calidad de cada repetición.', items: [['Dead bug', '2×8–10/lado'], ['Plancha lateral', '2×20–30 s/lado'], ['Pallof press', '2×10–12/lado']] },
+};
+const CACO = [
+  { label: '5×3', desc: '5 bloques · 3 min correr / 2 min andar · ~8 km/h', run: 3, walk: 2, n: 5 },
+  { label: '4×5', desc: '4 bloques · 5 min correr / 2 min andar · ~7,5 km/h', run: 5, walk: 2, n: 4 },
+  { label: '3×7', desc: '3 bloques · 7 min correr / 2 min andar', run: 7, walk: 2, n: 3 },
+  { label: '2×10', desc: '2 bloques · 10 min correr / 2 min andar', run: 10, walk: 2, n: 2 },
+  { label: '1×20', desc: '20 min correr continuo', run: 20, walk: 0, n: 1 },
+];
+const CUT_START = '2026-09-08', CUT_WARN = '2026-11-16', CUT_END = '2026-11-30';
+const Y = '#FFD400', INK = '#0A0A0B', PAPER = '#F2F2EE', GREEN = '#5BE37D', RED = '#FF4D3D';
+const iso = d => d.toISOString().slice(0, 10);
+const addDays = (s, n) => { const d = new Date(s + 'T12:00:00'); d.setDate(d.getDate() + n); return iso(d); };
+const daysBetween = (a, b) => Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 864e5);
+const fmtD = s => { const d = new Date(s + 'T12:00:00'); return d.getDate() + ' ' + ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][d.getMonth()]; };
+const n1 = v => (Math.round(v * 10) / 10).toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const signed = v => (v > 0 ? '+' : v < 0 ? '−' : '±') + n1(Math.abs(v));
+const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+
+function seed() {
+  const t = iso(new Date());
+  const w = [97.4, 97.1, 97.3, 96.9, 97.0, 96.8, 97.1, 96.9, 96.8, 97.0];
+  const mk = (type, d, load) => ({ d, type, sets: EX[type].ex.flatMap((e, i) => Array.from({ length: e[1] }, (_, k) => ({ ex: e[0], kg: load[i], reps: 10 - k }))) });
+  return {
+    weights: w.map((kg, i) => ({ d: addDays(t, i - 10), kg })),
+    waist: [{ d: addDays(t, -7), cm: 99.5 }],
+    recovery: [5, 4, 6, 3, 2, 1].map(i => ({ d: addDays(t, -i), hambre: 2 + (i % 2), energia: 3 + (i % 2), horas: 7 + (i % 3) * 0.5, calidad: 3 + (i % 2) })),
+    strength: [mk('TA', addDays(t, -9), [60, 55, 8, 45, 35, 40, 14, 25]), mk('PA', addDays(t, -7), [100, 120, 140, 45, 50, 8, 80, 30, 60, 20]), mk('TB', addDays(t, -5), [8, 55, 60, 50, 35, 45, 14, 20]), mk('PB', addDays(t, -2), [120, 140, 45, 40, 50, 8, 30, 60, 20])],
+    runs: [{ d: '2026-08-26', level: 0, runMin: 15, walkMin: 10, fc: 131, fcMax: 154, km: 3.54, sens: 4, dolor: 1 }, { d: '2026-08-28', level: 0, runMin: 15, walkMin: 10, fc: 124, fcMax: 153, km: 3.59, sens: 4, dolor: 0 }, { d: '2026-08-31', level: 1, runMin: 20, walkMin: 8, fc: 122, fcMax: 139, km: 3.54, sens: 4, dolor: 1 }],
+    runLevel: 1, extras: [], decision: null,
+  };
+}
+
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    let data = null; try { data = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+    if (!data || !data.weights) { data = seed(); try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
+    this.state = { tab: 'hoy', ent: 'menu', sel: null, live: null, rutina: 'postura', rutDone: {}, prog: 'cuerpo', plan: 'plan', modal: null, form: {}, toast: null, data };
+  }
+  componentDidMount() {
+    this._sync = e => { if (e.detail !== this) { try { this.setState({ data: JSON.parse(localStorage.getItem(KEY)) }); } catch (x) {} } };
+    window.addEventListener('forja-sync', this._sync);
+  }
+  componentWillUnmount() { window.removeEventListener('forja-sync', this._sync); clearTimeout(this._tt); }
+  componentDidUpdate(pp, ps) {
+    if (ps.data !== this.state.data) {
+      try { localStorage.setItem(KEY, JSON.stringify(this.state.data)); } catch (e) {}
+      window.dispatchEvent(new CustomEvent('forja-sync', { detail: this }));
+    }
+  }
+  today() {
+    const m = { 'día 20 del cut': '2026-09-27', '16 nov (aviso)': '2026-11-16', '30 nov (revisión)': '2026-11-30' };
+    return m[this.props.fechaSimulada] || iso(new Date());
+  }
+  setData(fn) {
+    const data = fn(JSON.parse(JSON.stringify(this.state.data)));
+    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
+    this.setState({ data }, () => window.dispatchEvent(new CustomEvent('forja-sync', { detail: this })));
+  }
+  showToast(t) { this.setState({ toast: t }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: null }), 2200); }
+  setForm(patch) { this.setState(s => ({ form: { ...s.form, ...patch } })); }
+  step(k, d, min, max) { return () => this.setForm({ [k]: Math.min(max, Math.max(min, Math.round((Number(this.state.form[k] || 0) + d) * 10) / 10)) }); }
+  scale(k, n, from = 1) {
+    return Array.from({ length: n }, (_, i) => { const v = i + from; const a = this.state.form[k] === v; return { v, bg: a ? Y : 'transparent', color: a ? INK : Y, on: () => this.setForm({ [k]: v }) }; });
+  }
+
+  renderVals() {
+    const s = this.state, d = s.data, T = this.today();
+    const variant = this.props.variant || 'panel';
+    const ws = [...d.weights].sort((a, b) => a.d < b.d ? -1 : 1);
+    const last7 = ws.filter(w => daysBetween(w.d, T) < 7 && w.d <= T).map(w => w.kg);
+    const prev7 = ws.filter(w => { const k = daysBetween(w.d, T); return k >= 7 && k < 14; }).map(w => w.kg);
+    const a7 = avg(last7), p7 = avg(prev7);
+    const wk = a7 != null && p7 != null ? a7 - p7 : null;
+    const todayW = ws.find(w => w.d === T);
+    const lastW = ws.filter(w => w.d <= T).slice(-1)[0];
+
+    // fase
+    const dayN = daysBetween(CUT_START, T) + 1;
+    const phaseLabel = dayN < 1 ? 'Pre-cut · empieza en ' + (1 - dayN) + ' días' : dayN > daysBetween(CUT_START, CUT_END) + 1 ? 'Revisión pendiente' : 'Definición · Día ' + dayN;
+    const isReviewDay = T >= CUT_END;
+    const showAviso = T >= CUT_WARN;
+    const avisoTitle = isReviewDay ? 'Revisión del cut' : 'Quedan ' + Math.max(1, Math.ceil(daysBetween(T, CUT_END) / 7)) + ' semanas para revisar el cut.';
+    const cutPct = Math.min(100, Math.max(0, (daysBetween(CUT_START, T) / daysBetween(CUT_START, CUT_END)) * 100)).toFixed(1) + '%';
+
+    // fuerza
+    const st = [...d.strength].sort((a, b) => a.d < b.d ? -1 : 1);
+    const lastS = st.slice(-1)[0];
+    const nextType = lastS ? SEQ[(SEQ.indexOf(lastS.type) + 1) % 4] : 'TA';
+    const doneToday = st.some(x => x.d === T);
+    const next = EX[nextType];
+    const total = t => EX[t].ex.reduce((a, e) => a + e[1], 0);
+    const lastOf = t => { const l = st.filter(x => x.type === t).slice(-1)[0]; return l ? 'Última: ' + fmtD(l.d) : 'Sin registro'; };
+    const lastValsFor = (type) => { const l = st.filter(x => x.type === type).slice(-1)[0]; const m = {}; if (l) l.sets.forEach(x => { if (!m[x.ex]) m[x.ex] = x; }); return m; };
+
+    // running
+    const lvl = Math.min(d.runLevel || 0, CACO.length - 1), caco = CACO[lvl];
+    const runs = [...d.runs].sort((a, b) => a.d < b.d ? 1 : -1);
+    const atLevel = runs.filter(r => r.level === lvl && r.dolor <= 2).length;
+    const lastRun = runs[0];
+    const dolor = lastRun ? lastRun.dolor : 0;
+    const dolorColor = dolor <= 2 ? GREEN : dolor <= 5 ? Y : RED;
+    const dolorText = dolor <= 2 ? 'Última sesión en verde (' + dolor + '/10). Puedes continuar.' : dolor <= 5 ? 'Última sesión en amarillo (' + dolor + '/10). No progresar hasta que desaparezca.' : 'Última sesión en rojo (' + dolor + '/10). Parar running y valorar.';
+    const runToday = runs.some(r => r.d === T);
+
+    // recuperación
+    const rec = [...d.recovery].sort((a, b) => a.d < b.d ? -1 : 1);
+    const recToday = rec.find(r => r.d === T);
+    const rec7 = rec.slice(-7);
+    const avgH = avg(rec7.map(r => r.hambre)), avgE = avg(rec7.map(r => r.energia)), avgS = avg(rec7.map(r => r.horas));
+    const suggestDeload = avgE != null && avgE < 2.5 && avgS != null && avgS < 6.5;
+
+    // cintura
+    const wa = [...d.waist].sort((a, b) => a.d < b.d ? -1 : 1);
+    const lastWa = wa.slice(-1)[0];
+    const waistDue = !lastWa || daysBetween(lastWa.d, T) >= 7;
+    const firstWa = wa.find(x => x.d >= CUT_START) || wa[0];
+
+    // hoy — tarjeta principal
+    const pendPostura = !d.extras.some(x => x.d === T && x.type === 'postura');
+    let main;
+    if (doneToday) main = { kicker: 'Sesión completada', title: 'Hoy no tienes que forzar nada.', sub: 'Descansa. La próxima sesión será ' + next.name + '.', meta: ['Recuperación'], cta: 'Ver progreso', action: () => this.setState({ tab: 'progreso' }), sec: pendPostura ? { cta: 'Rutina corta de postura', action: () => this.setState({ tab: 'entrenar', ent: 'rutina', rutina: 'postura', rutDone: {} }) } : null };
+    else main = { kicker: 'Próxima sesión', title: next.name, sub: next.muscles, meta: [total(nextType) + ' series', 'RIR 1–2', next.dur], cta: 'Empezar entrenamiento', action: () => this.startLive(nextType), sec: !runToday ? { cta: 'Running fácil — CaCo ' + caco.label, action: () => this.setState({ tab: 'entrenar', ent: 'running' }) } : null };
+
+    const openPeso = () => this.setState({ modal: 'peso', form: { kg: todayW ? todayW.kg : lastW ? lastW.kg : 97, dudosa: !!(todayW && todayW.dudosa) } });
+    const openRecup = () => this.setState({ modal: 'recup', form: recToday ? { ...recToday } : { hambre: 3, energia: 3, horas: 7.5, calidad: 3 } });
+    const openCintura = () => this.setState({ modal: 'cintura', form: { cm: lastWa ? lastWa.cm : 99 } });
+    const openRun = () => this.setState({ modal: 'run', form: { runMin: caco.run * caco.n, walkMin: caco.walk * caco.n, fc: lastRun ? lastRun.fc : 125, dolor: 0, sens: 4 } });
+
+    const checklist = [
+      { title: 'Peso', sub: todayW ? 'Media 7 d ' + n1(a7) + ' · semanal ' + signed(wk || 0) : 'Pendiente · tras orinar, antes de comer', value: todayW ? n1(todayW.kg) : '—', unit: 'kg', dot: todayW ? Y : 'transparent', on: openPeso },
+      { title: 'Recuperación', sub: recToday ? 'Hambre ' + recToday.hambre + ' · energía ' + recToday.energia + ' · calidad ' + recToday.calidad : 'Pendiente · hambre, energía, sueño', value: recToday ? n1(recToday.horas) : '—', unit: 'h', dot: recToday ? Y : 'transparent', on: openRecup },
+      { title: 'Cintura', sub: waistDue ? 'Toca medir cintura esta semana.' : 'Medida ' + fmtD(lastWa.d) + ' · ' + (firstWa ? signed(lastWa.cm - firstWa.cm) + ' cm desde inicio' : ''), value: lastWa ? n1(lastWa.cm) : '—', unit: 'cm', dot: waistDue ? 'transparent' : Y, on: openCintura },
+      { title: 'Nutrición', sub: '175 P · 268 C · 70 G · total del día manda', value: '2.400', unit: 'kcal', dot: Y, on: () => this.setState({ tab: 'plan', plan: 'plan' }) },
+    ];
+
+    // live
+    const live = s.live;
+    let liveEx = [], liveDone = 0, liveTotal = 0;
+    if (live) {
+      const lv = lastValsFor(live.type);
+      liveEx = EX[live.type].ex.map((e, i) => ({
+        n: i + 1, name: e[0], scheme: e[1] + '×' + e[2], rest: e[3], note: e[4], last: lv[e[0]] ? 'últ. ' + lv[e[0]].kg + ' kg × ' + lv[e[0]].reps : 'sin histórico',
+        sets: live.sets[i].map((x, k) => { liveTotal++; if (x.done) liveDone++; return {
+          n: k + 1, kg: x.kg, reps: x.reps, hintKg: lv[e[0]] ? String(lv[e[0]].kg) : 'kg', hintReps: e[2].split('–')[0],
+          setKg: ev => this.liveSet(i, k, { kg: ev.target.value }), setReps: ev => this.liveSet(i, k, { reps: ev.target.value }),
+          toggle: () => this.liveSet(i, k, { done: !x.done }), bg: x.done ? Y : 'transparent', color: x.done ? INK : Y, label: x.done ? 'Hecha' : 'Hacer' }; }),
+      }));
+    }
+
+    // progreso: chart
+    const chart = ws.filter(w => w.d <= T).slice(-14);
+    const kgs = chart.map(w => w.kg), mn = Math.min(...kgs) - 0.3, mx = Math.max(...kgs) + 0.3;
+    const px = (i, n) => n > 1 ? (i / (n - 1)) * 330 : 165, py = v => 125 - ((v - mn) / (mx - mn || 1)) * 115;
+    const weightPath = chart.map((w, i) => (i ? 'L' : 'M') + px(i, chart.length).toFixed(1) + ' ' + py(w.kg).toFixed(1)).join(' ');
+    const avgPath = chart.map((w, i) => { const sl = ws.filter(x => x.d <= w.d && daysBetween(x.d, w.d) < 7).map(x => x.kg); return (i ? 'L' : 'M') + px(i, chart.length).toFixed(1) + ' ' + py(avg(sl)).toFixed(1); }).join(' ');
+    const weightDots = chart.map((w, i) => ({ x: px(i, chart.length).toFixed(1), y: py(w.kg).toFixed(1) }));
+    const trendLabel = wk == null ? 'Sin datos suficientes' : wk < -0.7 ? 'Rápida — revisa' : wk < -0.25 ? 'En rango' : wk <= 0.25 ? 'Plana' : 'Sube';
+    const weightMessage = wk == null ? 'Sin datos suficientes, FORJA no debe ajustar el plan.' : wk < -0.7 ? 'La tendencia es rápida. Comprueba hambre, energía, sueño y rendimiento antes de tocar calorías.' : Math.abs(wk) <= 0.25 ? 'Todavía no hay evidencia suficiente para cambiar el plan.' : 'Un día no cambia el plan. Mira la media.';
+
+    // progreso: fuerza
+    const exMap = {};
+    st.forEach(sess => sess.sets.forEach(x => { const m = exMap[x.ex] || (exMap[x.ex] = { name: x.ex, last: null, best: 0, bestS: '—', n: new Set() }); m.n.add(sess.d); m.last = x.kg + '×' + x.reps; if (x.kg * x.reps > m.best) { m.best = x.kg * x.reps; m.bestS = x.kg + '×' + x.reps; } }));
+    const exProgress = Object.values(exMap).map(m => ({ name: m.name, last: m.last, best: m.bestS, sessions: m.n.size + ' sesiones' }));
+    const strengthSets = st.reduce((a, x) => a + x.sets.length, 0);
+    const strengthVol = Math.round(st.reduce((a, x) => a + x.sets.reduce((b, y) => b + (Number(y.kg) || 0) * (Number(y.reps) || 0), 0), 0)).toLocaleString('es-ES');
+
+    // progreso: running / recuperación
+    const runsList = runs.slice(0, 8).map(r => ({ date: fmtD(r.d), label: CACO[Math.min(r.level, CACO.length - 1)].label, detail: r.runMin + ' min corriendo · ' + r.walkMin + ' andando' + (r.km ? ' · ' + n1(r.km) + ' km' : ''), fc: r.fc, dolor: r.dolor, sens: r.sens, color: r.dolor <= 2 ? GREEN : r.dolor <= 5 ? Y : RED }));
+    const recupBars = rec7.map(r => ({ d: fmtD(r.d).split(' ')[0], h: (r.hambre / 5 * 100) + '%', e: (r.energia / 5 * 100) + '%', s: (Math.min(r.horas, 10) / 10 * 100) + '%' }));
+    const sem = (last7.length < 4 || rec7.length < 4) ? ['Amarillo', Y, 'Datos insuficientes o ambiguos. Sigue registrando.'] : (wk != null && wk < -0.8) || (avgH != null && avgH > 4) ? ['Rojo', RED, 'Hay una señal clara que requiere revisión. Nunca se cambian calorías automáticamente.'] : ['Verde', GREEN, 'Todo va en dirección correcta.'];
+
+    // revisión
+    const firstW = ws.find(w => w.d >= CUT_START) || ws[0];
+    const startRec = rec.slice(0, 7), nowRec = rec.slice(-7);
+    const rr = (k, a, b, fmt = n1, unit = '') => ({ k, a: a == null ? '—' : fmt(a) + unit, b: b == null ? '—' : fmt(b) + unit, d: a == null || b == null ? '—' : signed(b - a) });
+    const weeksIn = Math.max(1, daysBetween(CUT_START, T) / 7);
+    const adher = st.filter(x => x.d >= CUT_START).length / (weeksIn * 4) * 100;
+    const reviewRows = [rr('Peso (kg)', firstW && firstW.kg, lastW && lastW.kg), rr('Cintura (cm)', firstWa && firstWa.cm, lastWa && lastWa.cm), rr('Hambre /5', avg(startRec.map(r => r.hambre)), avg(nowRec.map(r => r.hambre))), rr('Energía /5', avg(startRec.map(r => r.energia)), avg(nowRec.map(r => r.energia))), rr('Sueño (h)', avg(startRec.map(r => r.horas)), avg(nowRec.map(r => r.horas))), { k: 'Adherencia fuerza', a: '4/sem', b: Math.min(100, Math.round(adher)) + '%', d: st.filter(x => x.d >= CUT_START).length + ' ses.' }];
+    const decisions = [['A', 'Pasar a mantenimiento'], ['B', 'Extender cut'], ['C', 'Mantenimiento y 2º bloque más adelante']].map(([k, label]) => ({ k, label, bg: d.decision === k ? Y : 'transparent', color: d.decision === k ? INK : Y, on: () => { this.setData(x => { x.decision = k; return x; }); this.showToast('Decisión guardada: ' + label); } }));
+
+    const tab = (id, label, glyph) => ({ label, glyph, on: () => this.setState({ tab: id, modal: null }), color: s.tab === id ? Y : '#9A9A96', bar: s.tab === id ? Y : 'transparent' });
+    const ent = s.tab === 'entrenar' ? s.ent : null;
+    const rut = RUTINAS[s.rutina];
+    const f = s.form;
+    const rutinaItems = rut.items.map(([name, scheme], i) => ({ name, scheme, bg: s.rutDone[i] ? Y : 'transparent', op: s.rutDone[i] ? .55 : 1, on: () => this.setState(x => ({ rutDone: { ...x.rutDone, [i]: !x.rutDone[i] } })) }));
+    const modalTitles = { peso: ['Peso de hoy', fmtD(T)], recup: ['Recuperación', fmtD(T)], cintura: ['Cintura', 'una vez por semana'], run: ['Sesión CaCo ' + caco.label, fmtD(T)] };
+
+    return {
+      isHoy: s.tab === 'hoy', isEntrenar: s.tab === 'entrenar', isProgreso: s.tab === 'progreso', isPlan: s.tab === 'plan' && s.plan === 'plan', isReview: s.tab === 'plan' && s.plan === 'review',
+      isPanel: variant !== 'foco', isFoco: variant === 'foco',
+      isEntMenu: ent === 'menu', isEntFuerza: ent === 'fuerza', isEntSesion: ent === 'sesion', isEntLive: ent === 'live' && !!live, isEntRunning: ent === 'running', isEntRutina: ent === 'rutina',
+      isProgCuerpo: s.prog === 'cuerpo', isProgFuerza: s.prog === 'fuerza', isProgRunning: s.prog === 'running', isProgRecup: s.prog === 'recup',
+      phaseLabel, showAviso, avisoTitle, isReviewDay, cutPct,
+      mainKicker: main.kicker, mainTitle: main.title, mainSub: main.sub, mainMeta: main.meta, mainCta: main.cta, mainAction: main.action, hasSecondary: !!main.sec, secondaryCta: main.sec ? main.sec.cta : '', secondaryAction: main.sec ? main.sec.action : null,
+      todayWeight: todayW ? n1(todayW.kg) : '—', avg7: a7 != null ? n1(a7) : '—', weeklyChange: wk != null ? signed(wk) + ' kg' : '—', pesoCta: todayW ? 'Editar' : 'Registrar',
+      recupStatus: recToday ? 'Registrado hoy' : 'Pendiente', recupCta: recToday ? 'Editar recuperación' : 'Registrar recuperación',
+      recupToday: [{ k: 'hambre', v: recToday ? recToday.hambre : '—' }, { k: 'energía', v: recToday ? recToday.energia : '—' }, { k: 'sueño h', v: recToday ? n1(recToday.horas) : '—' }, { k: 'calidad', v: recToday ? recToday.calidad : '—' }],
+      waistNow: lastWa ? n1(lastWa.cm) + ' cm' : '—', waistDelta: lastWa && firstWa ? signed(lastWa.cm - firstWa.cm) + ' cm desde inicio' : 'sin referencia', waistLine: waistDue ? 'Toca medir cintura esta semana.' : 'Medida el ' + fmtD(lastWa.d) + ' · próxima en ' + (7 - daysBetween(lastWa.d, T)) + ' días',
+      checklist, openPeso, openRecup, openCintura, openRun,
+      goHoy: () => this.setState({ tab: 'hoy' }), goEntMenu: () => this.setState({ tab: 'entrenar', ent: 'menu' }), goFuerza: () => this.setState({ tab: 'entrenar', ent: 'fuerza' }), goRunning: () => this.setState({ tab: 'entrenar', ent: 'running' }),
+      goPostura: () => this.setState({ tab: 'entrenar', ent: 'rutina', rutina: 'postura', rutDone: {} }), goCore: () => this.setState({ tab: 'entrenar', ent: 'rutina', rutina: 'core', rutDone: {} }),
+      goPlan: () => this.setState({ tab: 'plan', plan: 'plan' }), goReview: () => this.setState({ tab: 'plan', plan: 'review' }),
+      nextName: next.name, cacoLabel: caco.label, cacoDesc: caco.desc, cacoProgressNote: atLevel >= 2 && lvl < CACO.length - 1 ? 'Dos sesiones en verde: la próxima puede subir a ' + CACO[lvl + 1].label + '.' : 'Sesiones en verde a este nivel: ' + atLevel + '/2. Progresión solo si no interfiere con fuerza.',
+      dolorColor, dolorText, runsList, runsPerWeek: runs.length ? n1(Math.min(3, runs.filter(r => daysBetween(r.d, T) < 28).length / 4)) : '—', runFcAvg: runs.length ? Math.round(avg(runs.slice(0, 5).map(r => r.fc))) : '—',
+      seq: SEQ.map(t => ({ short: EX[t].short, state: t === nextType ? 'próxima' : lastS && lastS.type === t ? 'última' : '', border: t === nextType ? Y : 'rgba(255,255,255,.2)', bg: t === nextType ? Y : 'transparent', color: t === nextType ? INK : PAPER, on: () => this.setState({ tab: 'entrenar', ent: 'sesion', sel: t }) })),
+      sessionList: SEQ.map(t => ({ name: EX[t].name, goal: EX[t].goal, total: total(t), last: lastOf(t), state: t === nextType ? 'Próxima' : '', border: t === nextType ? Y : 'rgba(255,255,255,.16)', on: () => this.setState({ ent: 'sesion', sel: t }) })),
+      selName: s.sel ? EX[s.sel].name : '', selGoal: s.sel ? EX[s.sel].goal : '', selTotal: s.sel ? total(s.sel) : '', selDur: s.sel ? EX[s.sel].dur : '',
+      selExercises: s.sel ? EX[s.sel].ex.map((e, i) => ({ n: i + 1, name: e[0], scheme: e[1] + '×' + e[2], rest: e[3], note: e[4] })) : [],
+      startLive: () => this.startLive(s.sel), liveName: live ? EX[live.type].name : '', liveEx, liveDone, liveTotal, livePct: (liveTotal ? liveDone / liveTotal * 100 : 0) + '%',
+      cancelLive: () => this.setState({ live: null, ent: 'fuerza' }), finishLive: () => this.finishLive(),
+      rutinaName: rut.name, rutinaSub: rut.sub, rutinaCue: rut.cue, rutinaItems, finishRutina: () => { this.setData(x => { x.extras.push({ d: T, type: s.rutina }); return x; }); this.showToast('Rutina de ' + rut.name.toLowerCase() + ' completada.'); this.setState({ ent: 'menu', rutDone: {} }); },
+      progTabs: [['cuerpo', 'Cuerpo'], ['fuerza', 'Fuerza'], ['running', 'Running'], ['recup', 'Recup.']].map(([id, label]) => ({ label, on: () => this.setState({ prog: id }), bg: s.prog === id ? Y : 'transparent', color: s.prog === id ? INK : PAPER })),
+      chartDays: chart.length, chartRange: kgs.length ? n1(Math.min(...kgs)) + '–' + n1(Math.max(...kgs)) + ' kg' : '', weightPath, avgPath, weightDots, trendLabel, weightMessage,
+      strengthCount: st.length, strengthSets, strengthVol, exProgress,
+      avgHambre: avgH != null ? n1(avgH) : '—', avgEnergia: avgE != null ? n1(avgE) : '—', avgSueno: avgS != null ? n1(avgS) : '—', recupBars, semLabel: sem[0], semColor: sem[1], semText: sem[2], suggestDeload,
+      reviewRows, decisions,
+      tabs: [tab('hoy', 'Hoy', '◉'), tab('entrenar', 'Entrenar', '▲'), tab('progreso', 'Progreso', '◢'), tab('plan', 'Plan', '▤')],
+      hasModal: !!s.modal, closeModal: () => this.setState({ modal: null }), modalTitle: s.modal ? modalTitles[s.modal][0] : '', modalSub: s.modal ? modalTitles[s.modal][1] : '',
+      isModalPeso: s.modal === 'peso', isModalRecup: s.modal === 'recup', isModalCintura: s.modal === 'cintura', isModalRun: s.modal === 'run',
+      formKg: f.kg ?? '', setKg: e => this.setForm({ kg: e.target.value }), kgMinus: this.step('kg', -0.1, 40, 200), kgPlus: this.step('kg', 0.1, 40, 200), toggleDudosa: () => this.setForm({ dudosa: !f.dudosa }), dudosaBg: f.dudosa ? Y : 'transparent',
+      formCm: f.cm ?? '', setCm: e => this.setForm({ cm: e.target.value }), cmMinus: this.step('cm', -0.5, 50, 200), cmPlus: this.step('cm', 0.5, 50, 200),
+      hambreScale: this.scale('hambre', 5), energiaScale: this.scale('energia', 5), calidadScale: this.scale('calidad', 5), sensScale: this.scale('sens', 5), formHoras: f.horas != null ? n1(f.horas) : '—', hMinus: this.step('horas', -0.5, 0, 14), hPlus: this.step('horas', 0.5, 0, 14),
+      formRunMin: f.runMin ?? 0, runMinus: this.step('runMin', -1, 0, 120), runPlus: this.step('runMin', 1, 0, 120), formWalkMin: f.walkMin ?? 0, walkMinus: this.step('walkMin', -1, 0, 120), walkPlus: this.step('walkMin', 1, 0, 120),
+      formFc: f.fc ?? 0, fcMinus: this.step('fc', -1, 60, 220), fcPlus: this.step('fc', 1, 60, 220), formDolor: f.dolor ?? 0, dolMinus: this.step('dolor', -1, 0, 10), dolPlus: this.step('dolor', 1, 0, 10), formDolorColor: (f.dolor || 0) <= 2 ? GREEN : f.dolor <= 5 ? Y : RED,
+      saveModal: () => this.saveModal(),
+      hasToast: !!s.toast, toast: s.toast,
+    };
+  }
+
+  startLive(type) {
+    if (!type) return;
+    this.setState({ tab: 'entrenar', ent: 'live', sel: type, live: { type, sets: EX[type].ex.map(e => Array.from({ length: e[1] }, () => ({ kg: '', reps: '', done: false }))) } });
+  }
+  liveSet(i, k, patch) {
+    this.setState(s => { const live = JSON.parse(JSON.stringify(s.live)); Object.assign(live.sets[i][k], patch); return { live }; });
+  }
+  finishLive() {
+    const { live } = this.state, T = this.today();
+    const sets = [];
+    EX[live.type].ex.forEach((e, i) => live.sets[i].forEach(x => { if (x.done || x.kg || x.reps) sets.push({ ex: e[0], kg: Number(x.kg) || 0, reps: Number(x.reps) || 0 }); }));
+    if (!sets.length) { this.showToast('Marca al menos una serie antes de finalizar.'); return; }
+    this.setData(d => { d.strength.push({ d: T, type: live.type, sets }); return d; });
+    this.setState({ live: null, ent: 'menu', tab: 'hoy' });
+    this.showToast(EX[live.type].name + ' guardada · ' + sets.length + ' series. Próxima: ' + EX[SEQ[(SEQ.indexOf(live.type) + 1) % 4]].name);
+  }
+  saveModal() {
+    const { modal, form: f } = this.state, T = this.today();
+    if (modal === 'peso') { const kg = Number(f.kg); if (!kg) return; this.setData(d => { d.weights = d.weights.filter(w => w.d !== T); d.weights.push({ d: T, kg, dudosa: !!f.dudosa }); return d; }); this.showToast(f.dudosa ? 'Pesada dudosa guardada. Mira la media.' : 'Un día no cambia el plan. Mira la media.'); }
+    if (modal === 'cintura') { const cm = Number(f.cm); if (!cm) return; this.setData(d => { d.waist = d.waist.filter(w => w.d !== T); d.waist.push({ d: T, cm }); return d; }); this.showToast('Cintura guardada.'); }
+    if (modal === 'recup') { this.setData(d => { d.recovery = d.recovery.filter(r => r.d !== T); d.recovery.push({ d: T, hambre: f.hambre || 3, energia: f.energia || 3, horas: f.horas ?? 7.5, calidad: f.calidad || 3 }); return d; }); this.showToast('Recuperación guardada.'); }
+    if (modal === 'run') {
+      const lvl = Math.min(this.state.data.runLevel || 0, CACO.length - 1);
+      this.setData(d => { d.runs.push({ d: T, level: lvl, runMin: f.runMin, walkMin: f.walkMin, fc: f.fc, sens: f.sens || 3, dolor: f.dolor || 0 }); const ok = d.runs.filter(r => r.level === lvl && r.dolor <= 2).length; if (f.dolor <= 2 && ok >= 2 && lvl < CACO.length - 1) d.runLevel = lvl + 1; return d; });
+      this.showToast(f.dolor > 5 ? 'Rojo: parar running y valorar.' : f.dolor > 2 ? 'Amarillo: mantén esta sesión, no progreses.' : 'Sesión guardada. El running no debe perjudicar la hipertrofia.');
+    }
+    this.setState({ modal: null });
+  }
+}
+</script>
+</body>
+</html>

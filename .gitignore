@@ -1,0 +1,4 @@
+dist/
+public/iconos/
+node_modules/
+.DS_Store

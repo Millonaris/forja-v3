@@ -1,0 +1,21 @@
+/* FORJA 3.0 · Tokens. Gramática "Industry" con paleta invertida: fondo negro,
+   un único acento amarillo, esquinas rectas con marcas de registro. */
+:root {
+  --fondo: #0A0A0B;
+  --superficie: #141416;
+  --texto: #F2F2EE;
+  --texto-medio: #C9C9C4;
+  --texto-tenue: #9A9A96;
+  --linea: rgba(255, 255, 255, 0.16);
+  --linea-fuerte: rgba(255, 255, 255, 0.3);
+  --acento: #FFD400;
+  --acento-hover: #FFE45C;
+  --acento-suave: rgba(255, 212, 0, 0.06);
+  --tinta: #0A0A0B;
+  --verde: #5BE37D;
+  --rojo: #FF4D3D;
+  --fuente-titulo: "Barlow Condensed", "Barlow", system-ui, sans-serif;
+  --fuente-cuerpo: "Barlow", system-ui, sans-serif;
+  --seguro-arriba: env(safe-area-inset-top, 0px);
+  --seguro-abajo: env(safe-area-inset-bottom, 0px);
+}
