@@ -5,7 +5,7 @@
  * `node --test` sin navegador.
  */
 
-import { CUT, MENSAJES, UMBRALES } from "../datos/config.js";
+import { CUT, FUNCIONES, MENSAJES, UMBRALES } from "../datos/config.js";
 import { CACO, RUTINAS, RUTINAS_CORTAS, SECUENCIA, duracionCaco, seriesTotales } from "../datos/rutinas.js";
 import { diasEntre, sumarDias, ultimosDias } from "./fechas.js";
 import { avisoCut, diaDeFase, etiquetaFase, faseActual, inicioFase, mantenimientoConfirmable, objetivoFase, subestado, sugerenciaGanancia } from "./fase.js";
@@ -130,7 +130,7 @@ export function calcularResumen({ hoy, ajustes, diario = [], cintura = [], sesio
   if (sub === "REVIEW_DUE" && fase === "GAIN") alertas.push({ id: "revision-ganancia", texto: "Toca revisar la ganancia (cada ~4 semanas).", tipo: "fase" });
   if (deload.sugerir) alertas.push({ id: "deload", texto: MENSAJES.deload, tipo: "fuerza" });
   if (estadoRun === "RED_PAIN") alertas.push({ id: "rojo", texto: "Running en rojo: parar y valorar.", tipo: "running" });
-  if (semaforo.color === "ROJO") alertas.push({ id: "semaforo", texto: semaforo.texto, tipo: "nutricion" });
+  if (semaforo.color === "ROJO" && (FUNCIONES.recuperacion || !/recuperación/i.test(semaforo.texto))) alertas.push({ id: "semaforo", texto: semaforo.texto, tipo: "nutricion" });
   if (cToca && fase !== "PRE_CUT") alertas.push({ id: "cintura", texto: MENSAJES.faltaCintura, tipo: "cuerpo" });
   const msgPeso = mensajePesoHoy(diario, hoy);
 

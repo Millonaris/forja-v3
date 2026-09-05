@@ -6,7 +6,7 @@
  * Nunca se extiende automáticamente.
  */
 
-import { CUT, TDEE_ESTIMADO, UMBRALES } from "../datos/config.js";
+import { CUT, FUNCIONES, TDEE_ESTIMADO, UMBRALES } from "../datos/config.js";
 import { diasEntre, sumarDias } from "./fechas.js";
 import { adherencia, mediaKcal, mediaPasos, recuperacionMedia } from "./nutricion.js";
 import { cinturaDeReferencia, media7, pesosValidos, ultimaCintura, ultimoPeso } from "./peso.js";
@@ -47,9 +47,11 @@ export function datosRevision({ diario, cintura, sesiones, carreras, ajustes, ho
       fila("Peso (kg)", pesoInicial?.kg ?? null, pesoActual?.kg ?? null),
       fila("Media 7 días (kg)", m7Inicio, m7Ahora),
       fila("Cintura (cm)", cInicio?.cm ?? null, cAhora?.cm ?? null),
-      fila("Hambre /5", recInicio.hambre, recAhora.hambre),
-      fila("Energía /5", recInicio.energia, recAhora.energia),
-      fila("Sueño (h)", recInicio.sueno, recAhora.sueno),
+      ...(FUNCIONES.recuperacion ? [
+        fila("Hambre /5", recInicio.hambre, recAhora.hambre),
+        fila("Energía /5", recInicio.energia, recAhora.energia),
+        fila("Sueño (h)", recInicio.sueno, recAhora.sueno),
+      ] : []),
       fila("Pasos/día", pasosInicio, pasosAhora, "", 0),
       fila("Kcal medias", kcalInicio, kcalAhora, "", 0),
     ],

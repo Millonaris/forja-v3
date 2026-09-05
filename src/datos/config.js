@@ -87,6 +87,16 @@ export const REPARTO_COMIDAS = [
   { hora: "~21:00", que: "Cena" },
 ];
 
+/**
+ * Interruptores de funciones. Lo que está en `false` sigue en el código (datos,
+ * lógica y pantallas) pero no se enseña en la app. Para reactivar algo basta
+ * con ponerlo en `true`.
+ */
+export const FUNCIONES = {
+  // Registro diario de hambre / energía / sueño (§27). Jose lo aparcó el 5 sep 2026.
+  recuperacion: false,
+};
+
 /** §52, §53, §54 · Estados. */
 export const FASES = ["PRE_CUT", "CUT", "MAINTENANCE", "GAIN", "MINI_CUT"];
 export const SUBESTADOS = ["ACTIVE", "INSUFFICIENT_DATA", "REVIEW_DUE", "RECOVERY_WARNING", "TRANSITION"];

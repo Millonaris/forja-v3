@@ -4,7 +4,7 @@
  * amarillo con lo que toca y una lista de pendientes). Se elige en Ajustes.
  */
 
-import { MENSAJES } from "../datos/config.js";
+import { FUNCIONES, MENSAJES } from "../datos/config.js";
 import { RUTINAS_CORTAS } from "../datos/rutinas.js";
 import { fechaMedia } from "../logica/fechas.js";
 import { conSigno, n0, n1 } from "../logica/formato.js";
@@ -18,7 +18,7 @@ function loQueToca(r, ir, abrirModal) {
   }
   if (f.hechaHoy) {
     const sec = !r.extras.posturaHoy ? { cta: "Rutina corta de postura", accion: () => ir("entrenar", "rutina", "postura") } : r.extras.corePendiente ? { cta: "Core · pendiente esta semana", accion: () => ir("entrenar", "rutina", "core") } : null;
-    return { kicker: "Sesión completada", titulo: "Hoy no tienes que forzar nada.", sub: `Descansa. La próxima sesión será ${f.rutina.nombre}.`, meta: ["Recuperación"], cta: "Ver progreso", accion: () => ir("progreso", "fuerza"), sec, chico: true };
+    return { kicker: "Sesión completada", titulo: "Hoy no tienes que forzar nada.", sub: `Descansa. La próxima sesión será ${f.rutina.nombre}.`, meta: ["Descanso"], cta: "Ver progreso", accion: () => ir("progreso", "fuerza"), sec, chico: true };
   }
   const run = r.running.recomendacion;
   const sec = run.hacer ? { cta: `Running fácil — CaCo ${r.running.caco.codigo}`, accion: () => ir("entrenar", "running") } : null;
@@ -49,7 +49,7 @@ export default function Hoy({ r, ajustes, ir, abrirModal }) {
       {r.aviso.mostrar ? (
         <div className="aviso">
           <div className="titulo">{r.aviso.titulo}</div>
-          <div className="p13">Peso · cintura · fotos · fuerza · hambre · energía · sueño</div>
+          <div className="p13">Peso · cintura · fotos · fuerza{FUNCIONES.recuperacion ? " · hambre · energía · sueño" : ""}</div>
           {r.aviso.esDiaRevision ? <Boton variante="tinta" onClick={() => ir("plan", "revision")} style={{ marginTop: 8 }}>Abrir revisión del cut</Boton> : null}
         </div>
       ) : null}
@@ -84,6 +84,7 @@ export default function Hoy({ r, ajustes, ir, abrirModal }) {
             </Marco>
           </div>
 
+          {FUNCIONES.recuperacion ? (
           <Marco>
             <div className="entre">
               <div className="kicker">Recuperación</div>
@@ -97,6 +98,7 @@ export default function Hoy({ r, ajustes, ir, abrirModal }) {
             <Boton variante="secundario" onClick={() => abrirModal("recup")}>{recHecha ? "Editar recuperación" : "Registrar recuperación"}</Boton>
             <div className="p12 tenue">{MENSAJES.recuperacionImporta}</div>
           </Marco>
+          ) : null}
 
           <Marco onClick={() => abrirModal("cintura")} style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
             <div style={{ flex: 1 }}>
@@ -123,7 +125,7 @@ export default function Hoy({ r, ajustes, ir, abrirModal }) {
           <div className="lista">
             {[
               { titulo: "Peso", sub: r.peso.hoy ? `Media 7 d ${n1(r.peso.media7)} · semanal ${r.peso.tendencia != null ? conSigno(r.peso.tendencia) : "—"}` : "Pendiente · tras orinar, antes de comer", valor: r.peso.hoy ? n1(r.peso.hoy.kg) : "—", unidad: "kg", hecho: !!r.peso.hoy, on: () => abrirModal("peso") },
-              { titulo: "Recuperación", sub: recHecha ? `Hambre ${rec.hambre} · energía ${rec.energia} · calidad ${rec.suenoCalidad}` : "Pendiente · hambre, energía, sueño", valor: recHecha ? n1(rec.suenoHoras) : "—", unidad: "h", hecho: recHecha, on: () => abrirModal("recup") },
+              ...(FUNCIONES.recuperacion ? [{ titulo: "Recuperación", sub: recHecha ? `Hambre ${rec.hambre} · energía ${rec.energia} · calidad ${rec.suenoCalidad}` : "Pendiente · hambre, energía, sueño", valor: recHecha ? n1(rec.suenoHoras) : "—", unidad: "h", hecho: recHecha, on: () => abrirModal("recup") }] : []),
               { titulo: "Cintura", sub: r.cintura.toca ? "Toca medir cintura esta semana." : `Medida ${fechaMedia(r.cintura.ultima.fecha)} · ${r.cintura.delta != null ? conSigno(r.cintura.delta) + " cm desde inicio" : ""}`, valor: r.cintura.ultima ? n1(r.cintura.ultima.cm) : "—", unidad: "cm", hecho: !r.cintura.toca, on: () => abrirModal("cintura") },
               { titulo: "Nutrición", sub: r.pendientes.cierre ? `${r.macros.p} P · ${r.macros.c} C · ${r.macros.g} G · cierra el día con el total` : `Cerrado · ${n0(rec.kcal)} kcal · ${rec.proteinaG ?? "–"} P`, valor: n0(r.kcal), unidad: "kcal", hecho: !r.pendientes.cierre, on: () => abrirModal("cierre") },
             ].map((c) => (

@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 
-import { MENSAJES } from "../datos/config.js";
+import { FUNCIONES, MENSAJES } from "../datos/config.js";
 import { RUTINAS, nombrePorClave } from "../datos/rutinas.js";
 import { borrarCarrera, borrarCintura, borrarPeso, borrarSesion } from "../logica/acciones.js";
 import { diaCorto, fechaCorta } from "../logica/fechas.js";
@@ -17,7 +17,7 @@ import { Boton, Semaforo } from "../componentes/Controles.jsx";
 import Marco from "../componentes/Marco.jsx";
 import Fotos from "./Fotos.jsx";
 
-const PESTANAS = [["cuerpo", "Cuerpo"], ["fuerza", "Fuerza"], ["running", "Running"], ["recup", "Recup."]];
+const PESTANAS = [["cuerpo", "Cuerpo"], ["fuerza", "Fuerza"], ["running", "Running"], ...(FUNCIONES.recuperacion ? [["recup", "Recup."]] : [])];
 
 function GraficaPeso({ g }) {
   const puntos = g.pesos.map((p, i) => (p ? { i, kg: p.kg, dudosa: p.dudosa } : null)).filter(Boolean);
@@ -207,7 +207,7 @@ export default function Progreso({ vista = "cuerpo", ...props }) {
     <>
       <div className="titulo-xl">Progreso</div>
       <div className="segmentos">{PESTANAS.map(([id, t]) => <button key={id} className={vista === id ? "activo" : ""} onClick={() => ir("progreso", id)}>{t}</button>)}</div>
-      {vista === "fuerza" ? <FuerzaProg {...props} /> : vista === "running" ? <RunningProg {...props} /> : vista === "recup" ? <Recup {...props} /> : <Cuerpo {...props} />}
+      {vista === "fuerza" ? <FuerzaProg {...props} /> : vista === "running" ? <RunningProg {...props} /> : vista === "recup" && FUNCIONES.recuperacion ? <Recup {...props} /> : <Cuerpo {...props} />}
     </>
   );
 }
