@@ -140,7 +140,7 @@ function RunningProg({ r, avisar }) {
   return (
     <>
       <div className="rejilla-3">
-        <div><div className="etiqueta">Nivel CaCo</div><div className="num num-30">{run.caco.codigo}</div></div>
+        <div><div className="etiqueta">Sesión del plan</div><div className="num num-30">S{run.sesion}<span className="unidad" style={{ fontSize: 14 }}>/66</span></div></div>
         <div><div className="etiqueta">Sesiones/sem</div><div className="num num-30">{run.lista.length ? n1(run.porSemana4) : "—"}</div></div>
         <div><div className="etiqueta">FC media</div><div className="num num-30">{run.fcMedia ?? "—"}</div></div>
       </div>
@@ -151,7 +151,7 @@ function RunningProg({ r, avisar }) {
             <div key={c.id} className="fila">
               <div className={`punto ${sem === "GREEN" ? "verde" : sem === "YELLOW" ? "amarillo" : "rojo"}`} style={{ width: 10, height: 10 }} />
               <div className="p12 tenue" style={{ width: 52 }}>{fechaCorta(c.fecha)}</div>
-              <div className="crece"><div className="num num-20">{c.codigo}</div><div className="p12 tenue">{c.duracionMin} min · {c.correrMin} corriendo{c.distanciaKm ? ` · ${n1(c.distanciaKm)} km` : ""}{c.rpe ? ` · RPE ${c.rpe}` : ""}</div></div>
+              <div className="crece"><div className="num num-20">{c.sesion ? `S${c.sesion} · ` : ""}{c.codigo}</div><div className="p12 tenue">{c.duracionMin} min · {c.correrMin} corriendo{c.distanciaKm ? ` · ${n1(c.distanciaKm)} km` : ""}{c.rpe ? ` · RPE ${c.rpe}` : ""}{c.repetir ? " · repetir" : ""}</div></div>
               <div className="der p12 medio">FC {c.fcMedia ?? "—"}<br />sens. {c.sensacion ?? "—"}/5</div>
               <span className="p12 rojo" onClick={async () => { await borrarCarrera(c.id); avisar("Sesión borrada."); }}>×</span>
             </div>

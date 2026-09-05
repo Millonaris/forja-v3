@@ -6,7 +6,6 @@
 import { useState } from "react";
 
 import { CUT, MENSAJES, PROTEINA_RANGO } from "../datos/config.js";
-import { CACO } from "../datos/rutinas.js";
 import { cambiarKcal, empezarGanancia, empezarMiniCut, guardarCarrera, guardarCierre, guardarCintura, guardarPeso, guardarRecuperacion } from "../logica/acciones.js";
 import { fechaCorta } from "../logica/fechas.js";
 import { n0, n1 } from "../logica/formato.js";
@@ -115,11 +114,11 @@ export function ModalCierre({ r, onCerrar, avisar }) {
 }
 
 export function ModalCarrera({ r, onCerrar, avisar }) {
-  const caco = r.running.caco;
-  const nivel = r.running.nivel;
-  const [correr, setCorrer] = useState(caco.correr * caco.bloques);
-  const [andar, setAndar] = useState(caco.andar * caco.bloques);
-  const [km, setKm] = useState("");
+  const plan = r.running.plan;
+  const sesion = r.running.sesion;
+  const [correr, setCorrer] = useState(plan.correrMin);
+  const [andar, setAndar] = useState(plan.andarMin);
+  const [km, setKm] = useState(plan.tipo === "km" ? String(plan.km) : "");
   const [fc, setFc] = useState(r.running.ultima?.fcMedia ?? 125);
   const [fcMax, setFcMax] = useState("");
   const [rpe, setRpe] = useState(null);
@@ -128,31 +127,35 @@ export function ModalCarrera({ r, onCerrar, avisar }) {
   const [persiste, setPersiste] = useState(false);
   const [altera, setAltera] = useState(false);
   const [interfiere, setInterfiere] = useState(false);
+  const [repetir, setRepetir] = useState(false);
   const sem = semaforoDolor({ dolor, persiste, alteraMarcha: altera });
   const colorDolor = { GREEN: "var(--verde)", YELLOW: "var(--acento)", RED: "var(--rojo)" }[sem];
   const guardar = async () => {
-    const res = await guardarCarrera({ fecha: r.hoy, nivel, duracionMin: Number(correr) + Number(andar), correrMin: correr, andarMin: andar, distanciaKm: km, fcMedia: fc, fcMax, rpe, sensacion: sens, dolor, persiste, alteraMarcha: altera, interfiere });
+    const res = await guardarCarrera({ fecha: r.hoy, sesion, duracionMin: Number(correr) + Number(andar), correrMin: correr, andarMin: andar, distanciaKm: km, fcMedia: fc, fcMax, rpe, sensacion: sens, dolor, persiste, alteraMarcha: altera, interfiere, repetir });
     if (res.semaforo === "RED") avisar("Rojo: parar running y valorar.");
-    else if (res.semaforo === "YELLOW") avisar("Amarillo: mantén esta sesión, no progreses.");
+    else if (res.semaforo === "YELLOW") avisar(`Amarillo: repite S${sesion}, no progreses.`);
     else if (res.hold) avisar(MENSAJES.runningInterfiere);
-    else if (res.subeA) avisar(`Sesión guardada. Dos en verde: la próxima puede ser ${res.subeA}.`);
+    else if (res.repetir) avisar(`Guardada. S${sesion} se repite la próxima vez. No pasa nada.`);
+    else if (res.avanzaA) avisar(`S${sesion} en verde. La siguiente: S${res.avanzaA.n} · ${res.avanzaA.codigo}.`);
     else avisar("Sesión guardada. El running no debe perjudicar la hipertrofia.");
     onCerrar();
   };
   return (
-    <Hoja titulo={`Sesión CaCo ${caco.codigo}`} sub={fechaCorta(r.hoy)} onCerrar={onCerrar} onGuardar={guardar}>
+    <Hoja titulo={`S${sesion} · ${plan.codigo}`} sub={fechaCorta(r.hoy)} onCerrar={onCerrar} onGuardar={guardar}>
+      <div className="p13 medio">{plan.desc}. Objetivo RPE 3–4, pudiendo hablar.</div>
       <div className="rejilla-2">
-        <Campo etiqueta="Min corriendo"><Stepper valor={correr} onChange={setCorrer} min={0} max={180} /></Campo>
+        <Campo etiqueta="Min corriendo"><Stepper valor={correr} onChange={setCorrer} min={0} max={240} /></Campo>
         <Campo etiqueta="Min andando"><Stepper valor={andar} onChange={setAndar} min={0} max={120} /></Campo>
         <Campo etiqueta="FC media"><Stepper valor={fc} onChange={setFc} min={60} max={220} /></Campo>
         <Campo etiqueta="Dolor 0–10"><div className="stepper"><button type="button" onClick={() => setDolor(Math.max(0, dolor - 1))}>−</button><div className="valor" style={{ borderColor: colorDolor, color: colorDolor }}>{dolor}</div><button type="button" onClick={() => setDolor(Math.min(10, dolor + 1))}>+</button></div></Campo>
       </div>
       <div className="rejilla-2">
-        <Campo etiqueta="Km (Garmin, opcional)"><input className="input" type="number" inputMode="decimal" step="0.01" value={km} onChange={(e) => setKm(e.target.value)} placeholder="—" /></Campo>
+        <Campo etiqueta={plan.tipo === "km" ? "Km (Garmin)" : "Km (Garmin, opcional)"}><input className="input" type="number" inputMode="decimal" step="0.01" value={km} onChange={(e) => setKm(e.target.value)} placeholder="—" /></Campo>
         <Campo etiqueta="FC máx (opcional)"><input className="input" type="number" inputMode="numeric" value={fcMax} onChange={(e) => setFcMax(e.target.value)} placeholder="—" /></Campo>
       </div>
       <Campo etiqueta="RPE (objetivo 3–4)"><Escala valor={rpe} onChange={setRpe} desde={1} hasta={10} /></Campo>
       <Campo etiqueta="Sensación (1 mal · 5 genial)"><Escala valor={sens} onChange={setSens} /></Campo>
+      <Check activo={repetir} onChange={setRepetir}>Me costó demasiado: repetir esta sesión la próxima vez</Check>
       <Check activo={persiste} onChange={setPersiste}>Dolor localizado, recurrente o que persistió al día siguiente (amarillo)</Check>
       <Check activo={altera} onChange={setAltera}>Altera la marcha, hinchazón o duele andando (rojo)</Check>
       <Check activo={interfiere} onChange={setInterfiere}>Interfiere con la fuerza: piernas fatigadas, rendimiento a la baja (congela la progresión)</Check>
@@ -230,4 +233,4 @@ export function Modales({ modal, r, ajustes, onCerrar, avisar }) {
   }
 }
 
-export { CACO, CUT };
+export { CUT };

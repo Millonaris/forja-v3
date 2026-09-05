@@ -40,7 +40,8 @@ Sin router: la navegación es estado en `App.jsx`.
 
 - `src/datos/` — el PLAN escrito: `config.js` (usuario, cut, umbrales,
   mensajes §56, prohibiciones §55), `rutinas.js` (Torso A/B, Pierna A/B,
-  core, postura, escalera CaCo), `db.js` (esquema Dexie `forja3`).
+  core, postura, y el PLAN DE RUNNING definitivo de Jose: 66 sesiones S1–S66 en
+  5 fases, CaCo → 30 min → 5K → 10K → 15K → 20K; la 3.0 arranca en S5), `db.js` (esquema Dexie `forja3`).
 - `src/logica/` — motores puros y testeables: `peso.js` (media7, tendencia,
   cintura), `nutricion.js` (adherencia, TDEE deducido, semáforo, sugerencia
   de kcal), `progresion.js` (doble progresión), `fuerza.js` (secuencia,
@@ -57,7 +58,9 @@ Sin router: la navegación es estado en `App.jsx`.
 
 1. **El estado manda, la fecha solo recomienda.** La secuencia Torso A →
    Pierna A → Torso B → Pierna B avanza SOLO al completar sesiones. Sin reset
-   semanal. El CaCo sube por sesiones en verde, nunca por calendario.
+   semanal. El running avanza UNA sesión del plan por cada sesión en verde
+   (no si costó demasiado, ni con dolor amarillo, ni congelado), nunca por
+   calendario. 2/semana y nunca dos días seguidos.
 2. **FORJA nunca cambia kcal sola.** Sugiere (MANTENER / ESPERAR /
    CONSIDERAR ±100–150) y Jose decide en PLAN → Cambiar kcal. Mínimo 14 días
    entre cambios, adherencia ≥85 %, tendencias y no pesadas.

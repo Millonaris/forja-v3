@@ -6,13 +6,13 @@
  */
 
 import { CUT, FUNCIONES, MENSAJES, UMBRALES } from "../datos/config.js";
-import { CACO, RUTINAS, RUTINAS_CORTAS, SECUENCIA, duracionCaco, seriesTotales } from "../datos/rutinas.js";
+import { PLAN_RUNNING, RUTINAS, RUTINAS_CORTAS, SECUENCIA, sesionRunning, seriesTotales } from "../datos/rutinas.js";
 import { diasEntre, sumarDias, ultimosDias } from "./fechas.js";
 import { avisoCut, diaDeFase, etiquetaFase, faseActual, inicioFase, mantenimientoConfirmable, objetivoFase, subestado, sugerenciaGanancia } from "./fase.js";
 import { completadas, fuerzaEstable, hechaEl as fuerzaHechaEl, historialPorEjercicio, resumenEjercicios, senalesDeload, sesionAbierta, siguienteRutina, ultimaCompletada, ultimaDe, veredictosDeRutina, volumen } from "./fuerza.js";
 import { adherencia, calcularTdee, diaValido, mediaKcal, mediaPasos, mediaProteina, mensajePesoHoy, pasosComparables, recuperacionMedia, ritmoMensual, semaforoNutricional, sugerenciaKcal } from "./nutricion.js";
 import { cinturaBaja, cinturaDeReferencia, cinturaEstable, clasificarTendencia, media7, pesoDelDia, pesosTodos, pesosValidos, serieMedia7, tendenciaSemanal, tocaMedirCintura, ultimaCintura, ultimoPeso } from "./peso.js";
-import { carrerasOrdenadas, estadoRunning, hechaEl as runHechaEl, notaProgresion, nutricionRunning, puedeSubir, recomendacionHoy, semaforoDolor, sesionesEnSemana, verdesEnNivel } from "./running.js";
+import { carrerasOrdenadas, estadoRunning, faseDe, hechaEl as runHechaEl, notaProgresion, nutricionRunning, recomendacionHoy, restante, semaforoDolor, sesionesEnSemana } from "./running.js";
 
 export function calcularResumen({ hoy, ajustes, diario = [], cintura = [], sesiones = [], carreras = [], extras = [] }) {
   const fase = faseActual(ajustes, hoy);
@@ -88,20 +88,21 @@ export function calcularResumen({ hoy, ajustes, diario = [], cintura = [], sesio
   };
 
   /* ---- running ---- */
-  const nivel = Math.min(ajustes?.nivelCaco ?? 0, CACO.length - 1);
+  const sesionN = Math.min(Math.max(1, ajustes?.sesionRunning ?? 5), PLAN_RUNNING.length);
   const estadoRun = estadoRunning(ajustes, carreras);
-  const verdes = verdesEnNivel(carreras, nivel);
   const ordenadas = carrerasOrdenadas(carreras);
   const ultimaRun = ordenadas[0] || null;
+  const planSesion = sesionRunning(sesionN);
   const running = {
-    nivel,
-    caco: CACO[nivel],
-    duracionMin: duracionCaco(nivel),
+    sesion: sesionN,
+    plan: planSesion,
+    fase: faseDe(sesionN),
+    restante: restante(sesionN),
+    siguientes: PLAN_RUNNING.slice(sesionN, sesionN + 3),
+    duracionMin: planSesion.minEstimados,
     estado: estadoRun,
-    verdes,
-    puedeSubir: puedeSubir(estadoRun, verdes, nivel),
-    nota: notaProgresion({ estado: estadoRun, verdes, nivel }),
-    nutricion: nutricionRunning(duracionCaco(nivel)),
+    nota: notaProgresion({ estado: estadoRun, sesion: sesionN, ultima: ultimaRun }),
+    nutricion: nutricionRunning(planSesion.minEstimados),
     ultima: ultimaRun,
     semaforoUltima: ultimaRun ? semaforoDolor(ultimaRun) : null,
     hechaHoy: runHechaEl(carreras, hoy),

@@ -19,7 +19,7 @@
 
 import Dexie from "dexie";
 import { CUT } from "./config.js";
-import { NIVEL_CACO_INICIAL } from "./rutinas.js";
+import { SESION_RUNNING_INICIAL } from "./rutinas.js";
 
 export const db = new Dexie("forja3");
 
@@ -52,7 +52,7 @@ export const AJUSTES_INICIALES = {
   mantenimientoConfirmado: null, // fecha en la que Jose lo confirmó
   tdeeReferencia: null, // el último TDEE deducido válido que Jose aceptó
   estadoRunning: "PROGRESS",
-  nivelCaco: NIVEL_CACO_INICIAL,
+  sesionRunning: SESION_RUNNING_INICIAL, // S5: la siguiente del plan de 66 sesiones
   varianteHoy: "panel",
   ultimaCopia: null,
 };
@@ -71,5 +71,8 @@ export async function guardarAjustes(cambios) {
 /** Al arrancar: si no hay ajustes, se siembran los del plan. */
 export async function asegurarAjustes() {
   const hay = await db.ajustes.get(1);
-  if (!hay) await db.ajustes.put(AJUSTES_INICIALES);
+  if (!hay) { await db.ajustes.put(AJUSTES_INICIALES); return; }
+  // Instalaciones de la primera publicación (5 sep 2026) guardaban un nivel
+  // CaCo; el plan definitivo va por sesiones S1–S66 y arranca en S5.
+  if (hay.sesionRunning == null) await db.ajustes.update(1, { sesionRunning: SESION_RUNNING_INICIAL });
 }

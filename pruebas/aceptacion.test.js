@@ -7,7 +7,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { CUT } from "../src/datos/config.js";
-import { CACO, RUTINAS, SECUENCIA, seriesTotales } from "../src/datos/rutinas.js";
+import { PLAN_RUNNING, RUTINAS, SECUENCIA, sesionRunning, seriesTotales } from "../src/datos/rutinas.js";
 import { sumarDias } from "../src/logica/fechas.js";
 import { avisoCut, faseActual, mantenimientoConfirmable, subestado } from "../src/logica/fase.js";
 import { senalesDeload, siguienteRutina } from "../src/logica/fuerza.js";
@@ -16,7 +16,7 @@ import { clasificarTendencia, media7, pesosValidos, tendenciaSemanal } from "../
 import { veredicto } from "../src/logica/progresion.js";
 import { calcularResumen } from "../src/logica/resumen.js";
 import { aplicarDecision } from "../src/logica/revision.js";
-import { estadoRunning, puedeSubir, semaforoDolor, verdesEnNivel } from "../src/logica/running.js";
+import { avanza, estadoRunning, recomendacionHoy, semaforoDolor } from "../src/logica/running.js";
 
 const dia = (fecha, extra = {}) => ({ fecha, ...extra });
 const semanaDe = (desde, n, fn) => Array.from({ length: n }, (_, i) => fn(sumarDias(desde, i), i));
@@ -162,17 +162,34 @@ test("§19 · semáforo de dolor", () => {
   assert.equal(semaforoDolor({ dolor: 1, alteraMarcha: true }), "RED");
 });
 
-test("§17 · el running sube por sesiones en verde, y se congela si interfiere con la fuerza", () => {
-  const c = [{ fecha: "2026-09-01", nivel: 1, dolor: 1 }, { fecha: "2026-09-04", nivel: 1, dolor: 0 }];
-  assert.equal(verdesEnNivel(c, 1), 2);
-  assert.equal(puedeSubir("PROGRESS", 2, 1), true);
-  assert.equal(puedeSubir("HOLD", 2, 1), false);
-  assert.equal(puedeSubir("YELLOW_PAIN", 2, 1), false);
+test("plan de running: 66 sesiones, S3/S4 hechas, arranca en S5, y avanza una a una solo en verde", () => {
+  assert.equal(PLAN_RUNNING.length, 66);
+  assert.equal(sesionRunning(4).codigo, "4×5");
+  assert.equal(sesionRunning(5).codigo, "4×6");
+  assert.equal(sesionRunning(12).correrMin, 30);
+  assert.equal(sesionRunning(20).km, 5);
+  assert.equal(sesionRunning(34).km, 10);
+  assert.equal(sesionRunning(48).km, 15);
+  assert.equal(sesionRunning(66).km, 20);
+  assert.equal(PLAN_RUNNING.filter((p) => p.descarga).length, 6);
+  const verde = { dolor: 1 };
+  assert.equal(avanza({ carrera: verde, estado: "PROGRESS", sesion: 5 }), true);
+  assert.equal(avanza({ carrera: { dolor: 4 }, estado: "PROGRESS", sesion: 5 }), false);
+  assert.equal(avanza({ carrera: { ...verde, repetir: true }, estado: "PROGRESS", sesion: 5 }), false);
+  assert.equal(avanza({ carrera: { ...verde, interfiere: true }, estado: "PROGRESS", sesion: 5 }), false);
+  assert.equal(avanza({ carrera: verde, estado: "HOLD", sesion: 5 }), false);
+  assert.equal(avanza({ carrera: verde, estado: "PROGRESS", sesion: 66 }), false);
+  const c = [{ fecha: "2026-09-01", sesion: 5, dolor: 1 }];
   assert.equal(estadoRunning({ estadoRunning: "HOLD" }, c), "HOLD");
-  assert.equal(estadoRunning({ estadoRunning: "PROGRESS" }, [...c, { fecha: "2026-09-06", nivel: 1, dolor: 7 }]), "RED_PAIN");
-  // una sesión que interfiere no cuenta como verde aunque no haya dolor
-  assert.equal(verdesEnNivel([{ fecha: "2026-09-08", nivel: 2, dolor: 0, interfiere: true }], 2), 0);
-  assert.equal(CACO[CACO.length - 1].correr, 120);
+  assert.equal(estadoRunning({ estadoRunning: "PROGRESS" }, [...c, { fecha: "2026-09-06", sesion: 6, dolor: 7 }]), "RED_PAIN");
+});
+
+test("nunca dos días seguidos de running, y máximo 2 por semana", () => {
+  const ayer = [{ fecha: "2026-09-09", sesion: 5, dolor: 0 }];
+  assert.equal(recomendacionHoy({ estado: "PROGRESS", carreras: ayer, hoy: "2026-09-10", fuerzaHoy: false }).hacer, false);
+  assert.equal(recomendacionHoy({ estado: "PROGRESS", carreras: ayer, hoy: "2026-09-11", fuerzaHoy: false }).hacer, true);
+  const dos = [{ fecha: "2026-09-07", sesion: 5, dolor: 0 }, { fecha: "2026-09-09", sesion: 6, dolor: 0 }];
+  assert.equal(recomendacionHoy({ estado: "PROGRESS", carreras: dos, hoy: "2026-09-12", fuerzaHoy: false }).hacer, false);
 });
 
 /* ---------- §37–§39 · revisión y mantenimiento ---------- */
@@ -206,12 +223,13 @@ test("§53 · subestados", () => {
 
 /* ---------- §57 · pantalla HOY ---------- */
 test("§57 · el resumen arranca limpio, sin datos de prueba, y dice lo que toca", () => {
-  const r = calcularResumen({ hoy: "2026-09-08", ajustes: { kcalObjetivo: 2400, proteinaG: 175, carbosG: 268, grasaG: 70, nivelCaco: 1, estadoRunning: "PROGRESS", ultimoCambioKcal: "2026-09-08" } });
+  const r = calcularResumen({ hoy: "2026-09-08", ajustes: { kcalObjetivo: 2400, proteinaG: 175, carbosG: 268, grasaG: 70, sesionRunning: 5, estadoRunning: "PROGRESS", ultimoCambioKcal: "2026-09-08" } });
   assert.equal(r.fase, "CUT");
   assert.equal(r.diaFase, 1);
   assert.equal(r.etiqueta, "Definición · Día 1");
   assert.equal(r.fuerza.siguiente, "TORSO_A");
-  assert.equal(r.running.caco.codigo, "4×5");
+  assert.equal(r.running.sesion, 5);
+  assert.equal(r.running.plan.codigo, "4×6");
   assert.equal(r.kcal, 2400);
   assert.deepEqual(r.macros, { p: 175, c: 268, g: 70 });
   assert.equal(r.peso.media7, null);

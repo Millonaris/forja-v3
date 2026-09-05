@@ -5,9 +5,9 @@
  */
 
 import { db, guardarAjustes, leerAjustes } from "../datos/db.js";
-import { CACO, RUTINAS, idEjercicio } from "../datos/rutinas.js";
+import { PLAN_RUNNING, RUTINAS, idEjercicio, sesionRunning } from "../datos/rutinas.js";
 import { hoyISO } from "./fechas.js";
-import { semaforoDolor, verdesEnNivel, puedeSubir, estadoRunning } from "./running.js";
+import { avanza, estadoRunning, semaforoDolor } from "./running.js";
 import { aplicarDecision, parcheGanancia, parcheMiniCut, parcheVolverMantenimiento } from "./revision.js";
 
 async function actualizarDia(fecha, cambios) {
@@ -99,22 +99,23 @@ export async function borrarSesion(sesionId) {
 /* ---------- Running ---------- */
 
 /**
- * Guarda una sesión CaCo. Si va en verde, no interfiere y ya hay ≥2 en verde
- * a este nivel, sube el nivel (progresión por sesiones, no por calendario).
- * Si Jose marca que interfiere con la fuerza, congela la progresión (§17).
+ * Guarda una sesión de running. Si va en verde, no interfiere y no se pidió
+ * repetirla, se avanza a la siguiente del plan (progresión por sesiones, no
+ * por calendario). Si Jose marca que interfiere con la fuerza, se congela (§17).
  */
 export async function guardarCarrera(datos) {
   const ajustes = await leerAjustes();
-  const nivel = datos.nivel ?? ajustes.nivelCaco;
-  const fila = { fecha: datos.fecha || hoyISO(), nivel, codigo: CACO[nivel].codigo, duracionMin: Number(datos.duracionMin) || 0, correrMin: Number(datos.correrMin) || 0, andarMin: Number(datos.andarMin) || 0, distanciaKm: datos.distanciaKm ? Number(datos.distanciaKm) : null, fcMedia: datos.fcMedia ? Number(datos.fcMedia) : null, fcMax: datos.fcMax ? Number(datos.fcMax) : null, rpe: datos.rpe ? Number(datos.rpe) : null, sensacion: datos.sensacion ? Number(datos.sensacion) : null, dolor: Number(datos.dolor) || 0, persiste: !!datos.persiste, alteraMarcha: !!datos.alteraMarcha, interfiere: !!datos.interfiere, notas: datos.notas || "" };
+  const sesion = datos.sesion ?? ajustes.sesionRunning ?? 5;
+  const plan = sesionRunning(sesion);
+  const fila = { fecha: datos.fecha || hoyISO(), sesion, codigo: plan.codigo, fase: plan.fase, duracionMin: Number(datos.duracionMin) || 0, correrMin: Number(datos.correrMin) || 0, andarMin: Number(datos.andarMin) || 0, distanciaKm: datos.distanciaKm ? Number(datos.distanciaKm) : null, fcMedia: datos.fcMedia ? Number(datos.fcMedia) : null, fcMax: datos.fcMax ? Number(datos.fcMax) : null, rpe: datos.rpe ? Number(datos.rpe) : null, sensacion: datos.sensacion ? Number(datos.sensacion) : null, dolor: Number(datos.dolor) || 0, persiste: !!datos.persiste, alteraMarcha: !!datos.alteraMarcha, interfiere: !!datos.interfiere, repetir: !!datos.repetir, notas: datos.notas || "" };
   await db.carreras.add(fila);
   const carreras = await db.carreras.toArray();
   const cambios = {};
   if (fila.interfiere) cambios.estadoRunning = "HOLD";
   const estado = estadoRunning({ ...ajustes, ...cambios }, carreras);
-  if (puedeSubir(estado, verdesEnNivel(carreras, nivel), nivel) && nivel === ajustes.nivelCaco) cambios.nivelCaco = nivel + 1;
+  if (sesion === (ajustes.sesionRunning ?? 5) && avanza({ carrera: fila, estado, sesion })) cambios.sesionRunning = sesion + 1;
   if (Object.keys(cambios).length) await guardarAjustes(cambios);
-  return { semaforo: semaforoDolor(fila), subeA: cambios.nivelCaco != null ? CACO[cambios.nivelCaco].codigo : null, hold: fila.interfiere };
+  return { semaforo: semaforoDolor(fila), avanzaA: cambios.sesionRunning != null ? sesionRunning(cambios.sesionRunning) : null, hold: fila.interfiere, repetir: fila.repetir };
 }
 
 export async function borrarCarrera(id) {
@@ -126,8 +127,8 @@ export async function fijarEstadoRunning(estado) {
   await guardarAjustes({ estadoRunning: estado === "HOLD" ? "HOLD" : "PROGRESS" });
 }
 
-export async function fijarNivelCaco(nivel) {
-  await guardarAjustes({ nivelCaco: Math.max(0, Math.min(CACO.length - 1, nivel)) });
+export async function fijarSesionRunning(n) {
+  await guardarAjustes({ sesionRunning: Math.max(1, Math.min(PLAN_RUNNING.length, Number(n))) });
 }
 
 /* ---------- Rutinas cortas ---------- */

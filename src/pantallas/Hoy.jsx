@@ -21,7 +21,7 @@ function loQueToca(r, ir, abrirModal) {
     return { kicker: "Sesión completada", titulo: "Hoy no tienes que forzar nada.", sub: `Descansa. La próxima sesión será ${f.rutina.nombre}.`, meta: ["Descanso"], cta: "Ver progreso", accion: () => ir("progreso", "fuerza"), sec, chico: true };
   }
   const run = r.running.recomendacion;
-  const sec = run.hacer ? { cta: `Running fácil — CaCo ${r.running.caco.codigo}`, accion: () => ir("entrenar", "running") } : null;
+  const sec = run.hacer ? { cta: `Running fácil — S${r.running.sesion} · ${r.running.plan.codigo}`, accion: () => ir("entrenar", "running") } : null;
   return { kicker: "Próxima sesión", titulo: f.rutina.nombre, sub: f.rutina.musculos, meta: [`${f.porRutina.find((x) => x.id === f.siguiente).total} series`, "RIR 1–2", f.rutina.duracion], cta: "Empezar entrenamiento", accion: () => ir("entrenar", "sesion", f.siguiente), sec };
 }
 
