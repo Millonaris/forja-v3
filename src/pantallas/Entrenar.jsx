@@ -253,11 +253,11 @@ export function Running({ r, ir, abrirModal, avisar }) {
         <div className={`punto ${colorEstado}`} />
         <div className="p13 medio" style={{ flex: 1 }}><strong style={{ color: "var(--texto)" }}>{TEXTO_ESTADO_RUNNING[run.estado]}.</strong> {run.ultima ? `Última: ${fechaCorta(run.ultima.fecha)} · S${run.ultima.sesion ?? "?"} · ${run.semaforoUltima === "GREEN" ? "verde" : run.semaforoUltima === "YELLOW" ? "amarillo" : "rojo"}.` : "Sin sesiones en la 3.0 (S3 y S4 ya hechas)."}</div>
       </div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <Boton variante="chip" className={run.estado === "HOLD" ? "activo" : ""} onClick={async () => { await fijarEstadoRunning(run.estado === "HOLD" ? "PROGRESS" : "HOLD"); avisar(run.estado === "HOLD" ? "Progresión abierta de nuevo." : MENSAJES.runningInterfiere); }}>{run.estado === "HOLD" ? "Abrir progresión" : "Congelar"}</Boton>
-        <Boton variante="chip" onClick={() => setAjustando((v) => !v)}>Cambiar sesión</Boton>
-        <Boton variante="chip" onClick={() => setVerPlan((v) => !v)}>{verPlan ? "Ocultar plan" : "Plan completo"}</Boton>
-        <Boton variante="chip" onClick={() => setVerReglas((v) => !v)}>{verReglas ? "Ocultar reglas" : "Reglas"}</Boton>
+      <div className="rejilla-2" style={{ gap: 8 }}>
+        <Boton variante="chip" className={run.estado === "HOLD" ? "activo" : ""} style={{ width: "100%", height: 48 }} onClick={async () => { await fijarEstadoRunning(run.estado === "HOLD" ? "PROGRESS" : "HOLD"); avisar(run.estado === "HOLD" ? "Progresión abierta de nuevo." : MENSAJES.runningInterfiere); }}>{run.estado === "HOLD" ? "Abrir progresión" : "Congelar"}</Boton>
+        <Boton variante="chip" style={{ width: "100%", height: 48 }} onClick={() => setAjustando((v) => !v)}>Cambiar sesión</Boton>
+        <Boton variante="chip" style={{ width: "100%", height: 48 }} onClick={() => setVerPlan((v) => !v)}>{verPlan ? "Ocultar plan" : "Plan completo"}</Boton>
+        <Boton variante="chip" style={{ width: "100%", height: 48 }} onClick={() => setVerReglas((v) => !v)}>{verReglas ? "Ocultar reglas" : "Reglas"}</Boton>
       </div>
       {ajustando ? (
         <div className="caja columna">
