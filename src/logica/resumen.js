@@ -10,7 +10,7 @@ import { PLAN_RUNNING, RUTINAS, RUTINAS_CORTAS, SECUENCIA, sesionRunning, series
 import { diasEntre, sumarDias, ultimosDias } from "./fechas.js";
 import { avisoCut, diaDeFase, etiquetaFase, faseActual, inicioFase, mantenimientoConfirmable, objetivoFase, subestado, sugerenciaGanancia } from "./fase.js";
 import { completadas, fuerzaEstable, hechaEl as fuerzaHechaEl, historialPorEjercicio, resumenEjercicios, senalesDeload, sesionAbierta, siguienteRutina, ultimaCompletada, ultimaDe, veredictosDeRutina, volumen } from "./fuerza.js";
-import { adherencia, calcularTdee, diaValido, mediaKcal, mediaPasos, mediaProteina, mensajePesoHoy, pasosComparables, recuperacionMedia, ritmoMensual, semaforoNutricional, sugerenciaKcal } from "./nutricion.js";
+import { adherencia, calcularTdee, diaValido, mediaKcal, mediaPasos, mediaProteina, mensajePesoHoy, objetivoDelDia, pasosComparables, recuperacionMedia, resolverTipoDia, ritmoMensual, semaforoNutricional, semanaKcal, sugerenciaKcal } from "./nutricion.js";
 import { cinturaBaja, cinturaDeReferencia, cinturaEstable, clasificarTendencia, media7, pesoDelDia, pesosTodos, pesosValidos, serieMedia7, tendenciaSemanal, tocaMedirCintura, ultimaCintura, ultimoPeso } from "./peso.js";
 import { carrerasOrdenadas, estadoRunning, faseDe, hechaEl as runHechaEl, notaProgresion, nutricionRunning, recomendacionHoy, restante, semaforoDolor, sesionesEnSemana } from "./running.js";
 
@@ -58,7 +58,9 @@ export function calcularResumen({ hoy, ajustes, diario = [], cintura = [], sesio
   const diasDesdeCambio = ajustes?.ultimoCambioKcal ? diasEntre(ajustes.ultimoCambioKcal, hoy) : diasEnFase;
   const hayRuido = diario.filter((d) => diasEntre(d.fecha, hoy) < 14 && diasEntre(d.fecha, hoy) >= 0 && (d.pesoConfianza === "doubtful" || d.comidaSocial)).length >= 2;
   const fEstable = fuerzaEstable(sesiones);
-  const sugerencia = sugerenciaKcal({ fase, diasDesdeCambio, adherencia7: adh7, comparables, tendencia, tendenciaPrevia, cinturaBaja: cBaja, cinturaEstable: cEstable, recuperacion: rec7, kgRef, hayRuido, fuerzaEstable: fEstable });
+  const objetivosDia = ajustes?.objetivosDia || CUT.objetivosDia;
+  const kcalMinimaActual = Math.min(objetivosDia.REST.kcal, objetivosDia.STRENGTH.kcal);
+  const sugerencia = sugerenciaKcal({ fase, diasDesdeCambio, adherencia7: adh7, comparables, tendencia, tendenciaPrevia, cinturaBaja: cBaja, cinturaEstable: cEstable, recuperacion: rec7, kgRef, hayRuido, fuerzaEstable: fEstable, kcalMinimaActual });
   const sub = subestado({ fase, hoy, ajustes, diasEnFase, adherencia7: adh7, tendencia, semaforo });
 
   /* ---- fuerza ---- */
@@ -113,6 +115,14 @@ export function calcularResumen({ hoy, ajustes, diario = [], cintura = [], sesio
     fcMedia: ordenadas.slice(0, 5).filter((c) => c.fcMedia).length ? Math.round(ordenadas.slice(0, 5).filter((c) => c.fcMedia).reduce((t, c) => t + Number(c.fcMedia), 0) / ordenadas.slice(0, 5).filter((c) => c.fcMedia).length) : null,
   };
 
+  /* ---- tipo de día y objetivo de hoy (§4B, 3.1) ---- */
+  const fuerzaAbiertaHoy = !!(abierta && abierta.fecha === hoy);
+  const tipoDia = resolverTipoDia({ socialPlaneada: !!recHoy?.socialPlaneada, fuerzaPlaneadaOHecha: !!recHoy?.fuerzaPlaneada || fuerzaHoy || fuerzaAbiertaHoy });
+  const objetivoHoy = objetivoDelDia({ fase, tipo: tipoDia, ajustes });
+  const semana = semanaKcal(diario, hoy, ajustes, fase);
+  const ayer = diario.find((d) => d.fecha === sumarDias(hoy, -1));
+  const ayerSocial = !!(ayer && (ayer.tipoDia === "SOCIAL" || ayer.comidaSocial));
+
   /* ---- rutinas cortas ---- */
   const extrasSemana = extras.filter((e) => diasEntre(e.fecha, hoy) < 7 && diasEntre(e.fecha, hoy) >= 0);
   const posturaHoy = extras.some((e) => e.fecha === hoy && e.tipo === "postura");
@@ -149,7 +159,8 @@ export function calcularResumen({ hoy, ajustes, diario = [], cintura = [], sesio
     ajustes,
     hoy, fase, inicio, diaFase, diasEnFase, etiqueta: etiquetaFase(ajustes, hoy), objetivo: objetivoFase(fase), sub, kgRef,
     fechas: { inicioCut: CUT.inicio, fin: ajustes?.finProvisional || CUT.finProvisional, aviso: ajustes?.avisoPreRevision || CUT.avisoPreRevision },
-    kcal: ajustes?.kcalObjetivo ?? CUT.kcal, macros: { p: ajustes?.proteinaG ?? CUT.proteinaG, c: ajustes?.carbosG ?? CUT.carbosG, g: ajustes?.grasaG ?? CUT.grasaG },
+    kcal: objetivoHoy.kcal, macros: { p: objetivoHoy.proteinaG, c: objetivoHoy.carbosG, g: objetivoHoy.grasaG }, tipoDia, objetivoHoy, objetivosDia, semana, ayerSocial,
+    enCut: fase === "CUT" || fase === "PRE_CUT",
     peso: { hoy: pesoHoy, ultimo, media7: m7, tendencia, tendenciaPrevia, clase: claseTendencia, grafica, validos: pv.length, mensaje: msgPeso },
     cintura: { ultima: cUltima, referencia: cRef, toca: cToca, estable: cEstable, baja: cBaja, delta: cUltima && cRef ? cUltima.cm - cRef.cm : null, lista: [...cintura].sort((a, b) => b.fecha.localeCompare(a.fecha)) },
     nutricion: { diario7, adherencia7: adh7, kcal7, prot7, pasos7, comparables, rec7, recHoy, cierreHoy, tdee, semaforo, sugerencia, diasDesdeCambio, hayRuido, fuerzaEstable: fEstable },

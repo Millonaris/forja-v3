@@ -4,9 +4,10 @@
  * amarillo con lo que toca y una lista de pendientes). Se elige en Ajustes.
  */
 
-import { FUNCIONES, MENSAJES } from "../datos/config.js";
+import { FUNCIONES, MENSAJES, NOMBRE_TIPO_DIA, TIPOS_DIA } from "../datos/config.js";
 import { RUTINAS_CORTAS } from "../datos/rutinas.js";
 import { fechaMedia } from "../logica/fechas.js";
+import { fijarTipoDia } from "../logica/acciones.js";
 import { conSigno, n0, n1 } from "../logica/formato.js";
 import { Boton } from "../componentes/Controles.jsx";
 import Marco from "../componentes/Marco.jsx";
@@ -25,7 +26,29 @@ function loQueToca(r, ir, abrirModal) {
   return { kicker: "Próxima sesión", titulo: f.rutina.nombre, sub: f.rutina.musculos, meta: [`${f.porRutina.find((x) => x.id === f.siguiente).total} series`, "RIR 1–2", f.rutina.duracion], cta: "Empezar entrenamiento", accion: () => ir("entrenar", "sesion", f.siguiente), sec };
 }
 
-export default function Hoy({ r, ajustes, ir, abrirModal }) {
+/** §4B · Chips de tipo de día (solo en cut). Si ya hay fuerza hecha, STRENGTH manda sobre REST. */
+function TipoDia({ r, avisar }) {
+  if (!r.enCut) return null;
+  const fuerzaHecha = r.fuerza.hechaHoy || (r.fuerza.abierta && r.fuerza.abierta.fecha === r.hoy);
+  return (
+    <div style={{ display: "flex", gap: 6 }}>
+      {TIPOS_DIA.map((t) => (
+        <button key={t} type="button" className={`btn btn-chip ${r.tipoDia === t ? "activo" : ""}`} style={{ flex: 1, height: 40 }} disabled={t === "REST" && fuerzaHecha}
+          onClick={async () => { await fijarTipoDia(r.hoy, t); avisar(t === "SOCIAL" ? "Día social: 2.500 kcal, proteína ~175 g, resto flexible." : t === "STRENGTH" ? "Día de fuerza: 2.250 kcal." : "Día de descanso: 2.150 kcal."); }}>
+          {NOMBRE_TIPO_DIA[t]} · {n0(r.objetivosDia[t].kcal)}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Semana({ r }) {
+  const s = r.semana;
+  if (!s.diasRegistrados) return <div className="p12 tenue">Semana: sin días cerrados todavía · referencia {n0(s.referencia)} kcal.</div>;
+  return <div className="p12 tenue">Semana: <strong style={{ color: "var(--texto)" }}>{n0(s.consumido)}</strong> kcal en {s.diasRegistrados} {s.diasRegistrados === 1 ? "día" : "días"} · esperado {n0(s.esperado)} ({conSigno(s.diferencia, 0)}) · referencia {n0(s.referencia)}/semana.</div>;
+}
+
+export default function Hoy({ r, ajustes, ir, abrirModal, avisar }) {
   const foco = ajustes.varianteHoy === "foco";
   const main = loQueToca(r, ir, abrirModal);
   const rec = r.nutricion.recHoy;
@@ -71,9 +94,9 @@ export default function Hoy({ r, ajustes, ir, abrirModal }) {
 
           <div className="rejilla-2">
             <Marco onClick={() => abrirModal("cierre")} style={{ padding: 14 }}>
-              <div className="kicker">Nutrición</div>
+              <div className="kicker">Nutrición{r.enCut ? ` · ${NOMBRE_TIPO_DIA[r.tipoDia]}` : ""}</div>
               <div className="num num-36">{n0(r.kcal)} <span className="unidad">kcal</span></div>
-              <div className="p13 medio" style={{ lineHeight: 1.5 }}>{r.macros.p} g proteína<br />{r.macros.c} g carbohidratos<br />{r.macros.g} g grasa</div>
+              <div className="p13 medio" style={{ lineHeight: 1.5 }}>{r.macros.p} g proteína<br />{r.objetivoHoy.flexible ? "carbos y grasa flexibles" : <>{r.macros.c} g carbohidratos<br />{r.macros.g} g grasa</>}</div>
               <div className="t acento" style={{ marginTop: "auto", fontSize: 15, letterSpacing: ".06em", textTransform: "uppercase" }}>{r.pendientes.cierre ? "Cerrar el día →" : `Cerrado · ${n0(rec.kcal)} kcal →`}</div>
             </Marco>
             <Marco onClick={() => abrirModal("peso")} style={{ padding: 14 }}>
@@ -83,6 +106,10 @@ export default function Hoy({ r, ajustes, ir, abrirModal }) {
               <div className="t acento" style={{ marginTop: "auto", fontSize: 15, letterSpacing: ".06em", textTransform: "uppercase" }}>{r.peso.hoy ? "Editar" : "Registrar"} →</div>
             </Marco>
           </div>
+
+          <TipoDia r={r} avisar={avisar} />
+          <Semana r={r} />
+          {r.ayerSocial ? <div className="p12 tenue centro">{MENSAJES.diaSocialSiguiente}</div> : null}
 
           {FUNCIONES.recuperacion ? (
           <Marco>
@@ -127,7 +154,7 @@ export default function Hoy({ r, ajustes, ir, abrirModal }) {
               { titulo: "Peso", sub: r.peso.hoy ? `Media 7 d ${n1(r.peso.media7)} · semanal ${r.peso.tendencia != null ? conSigno(r.peso.tendencia) : "—"}` : "Pendiente · tras orinar, antes de comer", valor: r.peso.hoy ? n1(r.peso.hoy.kg) : "—", unidad: "kg", hecho: !!r.peso.hoy, on: () => abrirModal("peso") },
               ...(FUNCIONES.recuperacion ? [{ titulo: "Recuperación", sub: recHecha ? `Hambre ${rec.hambre} · energía ${rec.energia} · calidad ${rec.suenoCalidad}` : "Pendiente · hambre, energía, sueño", valor: recHecha ? n1(rec.suenoHoras) : "—", unidad: "h", hecho: recHecha, on: () => abrirModal("recup") }] : []),
               { titulo: "Cintura", sub: r.cintura.toca ? "Toca medir cintura esta semana." : `Medida ${fechaMedia(r.cintura.ultima.fecha)} · ${r.cintura.delta != null ? conSigno(r.cintura.delta) + " cm desde inicio" : ""}`, valor: r.cintura.ultima ? n1(r.cintura.ultima.cm) : "—", unidad: "cm", hecho: !r.cintura.toca, on: () => abrirModal("cintura") },
-              { titulo: "Nutrición", sub: r.pendientes.cierre ? `${r.macros.p} P · ${r.macros.c} C · ${r.macros.g} G · cierra el día con el total` : `Cerrado · ${n0(rec.kcal)} kcal · ${rec.proteinaG ?? "–"} P`, valor: n0(r.kcal), unidad: "kcal", hecho: !r.pendientes.cierre, on: () => abrirModal("cierre") },
+              { titulo: r.enCut ? `Nutrición · ${NOMBRE_TIPO_DIA[r.tipoDia]}` : "Nutrición", sub: r.pendientes.cierre ? (r.objetivoHoy.flexible ? `${r.macros.p} P · resto flexible · cierra el día con el total` : `${r.macros.p} P · ${r.macros.c} C · ${r.macros.g} G · cierra el día con el total`) : `Cerrado · ${n0(rec.kcal)} kcal · ${rec.proteinaG ?? "–"} P`, valor: n0(r.kcal), unidad: "kcal", hecho: !r.pendientes.cierre, on: () => abrirModal("cierre") },
             ].map((c) => (
               <div key={c.titulo} className="fila pulsable" style={{ minHeight: 68, gap: 14 }} onClick={c.on}>
                 <div style={{ width: 14, height: 14, border: "1.5px solid var(--acento)", background: c.hecho ? "var(--acento)" : "transparent", flex: "none" }} />
@@ -136,6 +163,8 @@ export default function Hoy({ r, ajustes, ir, abrirModal }) {
               </div>
             ))}
           </div>
+          <TipoDia r={r} avisar={avisar} />
+          <Semana r={r} />
           <div className="nota">{MENSAJES.totalDelDia}</div>
         </>
       )}

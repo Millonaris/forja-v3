@@ -62,7 +62,8 @@ function Cuerpo({ r, ir, avisar }) {
         <Marco style={{ padding: 14 }}><div className="etiqueta">Pasos medios 7 d</div><div className="num num-30">{n0(r.nutricion.pasos7)}</div><div className="p12 medio">indicador de actividad, no kcal{r.nutricion.comparables === false ? " · no comparable" : ""}</div></Marco>
       </div>
       <div className="rejilla-2">
-        <Marco style={{ padding: 14 }}><div className="etiqueta">Kcal medias 7 d</div><div className="num num-30">{n0(r.nutricion.kcal7)}</div><div className="p12 medio">objetivo {n0(r.kcal)} · proteína {n0(r.nutricion.prot7)} g</div></Marco>
+        <Marco style={{ padding: 14 }}><div className="etiqueta">Kcal medias 7 d</div><div className="num num-30">{n0(r.nutricion.kcal7)}</div><div className="p12 medio">{r.enCut ? `referencia ~${n0(r.objetivosDia ? 2293 : r.kcal)}/día` : `objetivo ${n0(r.kcal)}`} · proteína {n0(r.nutricion.prot7)} g</div></Marco>
+        <Marco style={{ padding: 14 }}><div className="etiqueta">Semana en curso</div><div className="num num-30">{n0(r.semana.consumido)}</div><div className="p12 medio">{r.semana.diasRegistrados} {r.semana.diasRegistrados === 1 ? "día" : "días"} · esperado {n0(r.semana.esperado)} · ref. {n0(r.semana.referencia)}</div></Marco>
         <Marco style={{ padding: 14 }}><div className="etiqueta">Adherencia 7 d</div><div className="num num-30">{Math.round(r.nutricion.adherencia7 * 100)} %</div><div className="p12 medio">{r.nutricion.adherencia7 >= .85 ? "≥85 %: datos fiables" : "<85 %: una semana más limpia"}</div></Marco>
       </div>
       <Marco onClick={() => ir("progreso", "fotos")} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>

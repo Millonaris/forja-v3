@@ -1,7 +1,7 @@
 {
   "name": "forja-v3",
   "private": true,
-  "version": "3.0.0",
+  "version": "3.1.0",
   "type": "module",
   "description": "FORJA 3.0 — hipertrofia, definición, running, postura y recuperación. Local, sin cuentas.",
   "scripts": {

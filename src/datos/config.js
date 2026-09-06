@@ -25,22 +25,84 @@ export const PRIORIDADES = [
   { id: "running_hobby", titulo: "Running", texto: "Hobby complementario. 20 km a largo plazo sin fecha. Nunca a costa de la hipertrofia." },
 ];
 
-/** §3, §36 · Fase nutricional programada: el cut. */
+/** §3, §4, §36 · Fase nutricional programada: el cut, con calorías por TIPO DE DÍA (3.1). */
+export const TIPOS_DIA = ["REST", "STRENGTH", "SOCIAL"];
+export const NOMBRE_TIPO_DIA = { REST: "Descanso", STRENGTH: "Fuerza", SOCIAL: "Social" };
+
 export const CUT = {
   inicio: "2026-09-08",
   finProvisional: "2026-11-30",
   avisoPreRevision: "2026-11-16",
-  kcal: 2400,
+  // Semana estándar: 2 REST + 3 STRENGTH + 2 SOCIAL = 16.050 kcal ≈ 2.293/día.
+  semanaReferenciaKcal: 16050,
+  mediaReferenciaKcal: 2293,
+  semanaEstandar: { REST: 2, STRENGTH: 3, SOCIAL: 2 },
+  objetivosDia: {
+    REST: { kcal: 2150, proteinaG: 175, carbosG: 216, grasaG: 65 },
+    STRENGTH: { kcal: 2250, proteinaG: 175, carbosG: 241, grasaG: 65 },
+    // En SOCIAL no se exigen macros: la estimación de restaurante es ruidosa.
+    SOCIAL: { kcal: 2500, proteinaG: 175, carbosG: null, grasaG: null },
+  },
+  // §31 · FORJA no puede reducir sola el objetivo diario por debajo de esto.
+  sueloKcalAutomatico: 2150,
+  // Compatibilidad: la media de referencia es "el objetivo" cuando hace falta un solo número.
+  kcal: 2293,
   proteinaG: 175,
-  carbosG: 268,
-  grasaG: 70,
+  grasaG: 65,
 };
 
 /** §4 · Rango práctico de proteína: no se exige exactitud absoluta. */
 export const PROTEINA_RANGO = { min: 165, max: 180 };
 
-/** §32 · TDEE inicial: estimación provisional, nunca una verdad. */
-export const TDEE_ESTIMADO = { min: 2850, max: 3000, estado: "ESTIMATED" };
+/** §32 · TDEE inicial: estimación provisional conservadora (~10.000 pasos, taller pequeño). */
+export const TDEE_ESTIMADO = { min: 2650, max: 2800, trabajo: 2700, estado: "ESTIMATED" };
+
+/** §45 · Registro rápido de restaurante. Si dudas entre dos presets, el superior. */
+export const RESTAURANTE = {
+  presets: [
+    { id: "SMALL", nombre: "Pequeña", kcal: 800 },
+    { id: "MEDIUM", nombre: "Media", kcal: 1200 },
+    { id: "LARGE", nombre: "Grande", kcal: 1600 },
+  ],
+  bebidas: [
+    { id: "CANA", nombre: "Caña", kcal: 90 },
+    { id: "BEER_33CL", nombre: "Tercio 33 cl", kcal: 150 },
+    { id: "WINE_GLASS", nombre: "Copa de vino", kcal: 120 },
+    { id: "MIXED_DRINK_OR_LIQUOR", nombre: "Copa / licor", kcal: 200 },
+  ],
+  ayudas: [
+    { id: "CROQUETA", nombre: "Croqueta", kcal: 80 },
+    { id: "BRAVAS_HANDFUL", nombre: "Puñado de bravas", kcal: 150 },
+    { id: "CALAMARI_5_6", nombre: "Calamares (5–6)", kcal: 200 },
+    { id: "SHARED_HAM_USER_PORTION", nombre: "Jamón (tu parte)", kcal: 150 },
+    { id: "BREAD_SLICE", nombre: "Rebanada de pan", kcal: 80 },
+    { id: "OLIVES_10", nombre: "10 aceitunas", kcal: 50 },
+    { id: "TORTILLA_PINCHO", nombre: "Pincho de tortilla", kcal: 250 },
+    { id: "PIZZA_SLICE", nombre: "Porción de pizza", kcal: 275 },
+  ],
+  confianzas: [
+    { id: "LOW", nombre: "Baja" },
+    { id: "MEDIUM", nombre: "Media" },
+    { id: "HIGH", nombre: "Alta" },
+  ],
+};
+
+/** §45B · Plantillas de comidas: sugerencias de reparto, no reglas duras. */
+export const PLANTILLAS_COMIDAS = {
+  STRENGTH: [
+    { comida: "Desayuno", hora: "09:00–09:30", p: 45, c: 60, g: 10, kcal: 510 },
+    { comida: "Comida post-entreno", hora: "13:00–13:30", p: 50, c: 80, g: 15, kcal: 655 },
+    { comida: "Merienda", hora: "17:00–18:00", p: 35, c: 35, g: 10, kcal: 370 },
+    { comida: "Cena", hora: "~21:00", p: 45, c: 66, g: 30, kcal: 714 },
+  ],
+  REST: [
+    { comida: "Desayuno", hora: "09:00–09:30", p: 45, c: 50, g: 10, kcal: 470 },
+    { comida: "Comida", hora: "13:00–13:30", p: 50, c: 70, g: 15, kcal: 615 },
+    { comida: "Merienda", hora: "17:00–18:00", p: 35, c: 30, g: 10, kcal: 350 },
+    { comida: "Cena", hora: "~21:00", p: 45, c: 66, g: 30, kcal: 714 },
+  ],
+  SOCIAL: { antes: "~1.150–1.250 kcal y ~110–125 g de proteína antes de la cena", cena: "Presupuesto orientativo de cena ~1.250–1.350 kcal. Sin macros exactos al restaurante." },
+};
 
 /** §30 · Ritmo objetivo de pérdida, en % del peso corporal por semana. */
 export const RITMO_CUT = { min: 0.004, max: 0.006, techoBlando: 0.007 };
@@ -78,14 +140,8 @@ export const SUPLEMENTOS = [
   { nombre: "Cafeína", pauta: "opcional" },
 ];
 
-/** Reparto habitual de comidas (documento visual §36). Orientativo. */
-export const REPARTO_COMIDAS = [
-  { hora: "09:00–09:30", que: "Desayuno" },
-  { hora: "~12:00", que: "Gym", destacado: true },
-  { hora: "13:00–13:30", que: "Comida post-entreno" },
-  { hora: "17:00–18:00", que: "Merienda" },
-  { hora: "~21:00", que: "Cena" },
-];
+/** Reparto habitual (documento visual §36). El gym va a ~12:00. */
+export const HORA_GYM = "~12:00";
 
 /**
  * Interruptores de funciones. Lo que está en `false` sigue en el código (datos,
@@ -141,6 +197,8 @@ export const MENSAJES = {
   faltaCintura: "La báscula no cuenta toda la historia. Mide cintura esta semana.",
   faltaRegistro: "Sin datos suficientes, FORJA no debe ajustar el plan.",
   sinDatos: "Sin datos suficientes, FORJA no debe ajustar el plan.",
+  sueloKcal: "Bajar de 2.150 kcal requiere revisión manual. FORJA no lo hace sola.",
+  diaSocialSiguiente: "Después de un día social, el siguiente es un día normal. Sin recortes ni castigos.",
   deload: "Parece que acumulas fatiga. Puede ser buen momento para reducir volumen temporalmente.",
   running20k: "El objetivo de 20 km no tiene fecha límite. Mantén esta sesión hasta que deje de interferir con fuerza y recuperación.",
   comidaSocial: "Una comida social puede reducir el déficit semanal, pero no arruina el proceso.",

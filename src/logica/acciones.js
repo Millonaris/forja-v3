@@ -37,10 +37,18 @@ export async function guardarRecuperacion({ fecha = hoyISO(), hambre, energia, s
   await actualizarDia(fecha, { hambre: Number(hambre), energia: Number(energia), suenoHoras: Number(suenoHoras), suenoCalidad: Number(suenoCalidad) });
 }
 
-/** El cierre del día: el TOTAL que Jose copia de Fitia, los pasos del Garmin y si hubo comida social. */
-export async function guardarCierre({ fecha = hoyISO(), kcal, proteinaG, carbosG, grasaG, pasos, comidaSocial = false, comidaSocialEstimada = false, notas = "" }) {
+/**
+ * El cierre del día: el TOTAL que Jose copia de Fitia, los pasos del Garmin y,
+ * si el día es SOCIAL, la estimación de restaurante (§45) con su confianza.
+ */
+export async function guardarCierre({ fecha = hoyISO(), tipoDia, kcal, proteinaG, carbosG, grasaG, pasos, comidaSocial = false, comidaSocialEstimada = false, restaurantePreset = null, restauranteKcal = null, restauranteConfianza = null, bebidas = null, notas = "" }) {
   const num = (v) => (v == null || v === "" ? null : Number(v));
-  await actualizarDia(fecha, { kcal: num(kcal), proteinaG: num(proteinaG), carbosG: num(carbosG), grasaG: num(grasaG), pasos: num(pasos), comidaSocial: !!comidaSocial, comidaSocialEstimada: !!comidaSocialEstimada, notas });
+  await actualizarDia(fecha, { tipoDia, kcal: num(kcal), proteinaG: num(proteinaG), carbosG: num(carbosG), grasaG: num(grasaG), pasos: num(pasos), comidaSocial: !!comidaSocial, comidaSocialEstimada: !!comidaSocialEstimada, restaurantePreset, restauranteKcal: num(restauranteKcal), restauranteConfianza, bebidas, notas });
+}
+
+/** §4B · Marcar el tipo de día de hoy: social planeada / fuerza planeada. */
+export async function fijarTipoDia(fecha, tipo) {
+  await actualizarDia(fecha, { socialPlaneada: tipo === "SOCIAL", fuerzaPlaneada: tipo === "STRENGTH", tipoDia: tipo });
 }
 
 export async function guardarNota(fecha, notas) {
@@ -154,6 +162,22 @@ export async function cambiarKcal({ kcal, proteinaG, carbosG, grasaG, motivo = "
   const hoy = hoyISO();
   await guardarAjustes({ kcalObjetivo: Number(kcal), proteinaG: Number(proteinaG), carbosG: Number(carbosG), grasaG: Number(grasaG), ultimoCambioKcal: hoy });
   await db.historial.add({ fecha: hoy, tipo: "kcal", texto: `${a.kcalObjetivo} → ${kcal} kcal (${proteinaG}P/${carbosG}C/${grasaG}G). ${motivo}`.trim() });
+}
+
+/** En CUT se cambian los tres objetivos por tipo de día a la vez (3.1). */
+export async function cambiarObjetivosDia({ rest, strength, social, proteinaG, grasaG, motivo = "" }) {
+  const a = await leerAjustes();
+  const hoy = hoyISO();
+  const carbos = (kcal) => Math.max(0, Math.round((kcal - proteinaG * 4 - grasaG * 9) / 4));
+  const objetivosDia = {
+    REST: { kcal: Number(rest), proteinaG: Number(proteinaG), carbosG: carbos(rest), grasaG: Number(grasaG) },
+    STRENGTH: { kcal: Number(strength), proteinaG: Number(proteinaG), carbosG: carbos(strength), grasaG: Number(grasaG) },
+    SOCIAL: { kcal: Number(social), proteinaG: Number(proteinaG), carbosG: null, grasaG: null },
+  };
+  const media = Math.round((rest * 2 + strength * 3 + social * 2) / 7);
+  await guardarAjustes({ objetivosDia, kcalObjetivo: media, proteinaG: Number(proteinaG), carbosG: carbos(strength), grasaG: Number(grasaG), ultimoCambioKcal: hoy });
+  const antes = a.objetivosDia || {};
+  await db.historial.add({ fecha: hoy, tipo: "kcal", texto: `Descanso ${antes.REST?.kcal ?? "—"} → ${rest} · Fuerza ${antes.STRENGTH?.kcal ?? "—"} → ${strength} · Social ${antes.SOCIAL?.kcal ?? "—"} → ${social} kcal (${proteinaG} P · ${grasaG} G). ${motivo}`.trim() });
 }
 
 export async function aceptarTdee(valor) {

@@ -6,9 +6,50 @@
  * medir → observar → comparar → decidir.
  */
 
-import { MENSAJES, TDEE_ESTIMADO, UMBRALES } from "../datos/config.js";
+import { CUT, MENSAJES, TDEE_ESTIMADO, UMBRALES } from "../datos/config.js";
 import { diasEntre, sumarDias, ultimosDias } from "./fechas.js";
 import { clasificarTendencia, media, media7, pesosValidos, tendenciaEnSemanas, tendenciaSemanal } from "./peso.js";
+
+/* ---------- §4B · Tipo de día (3.1) ---------- */
+
+/** SOCIAL > STRENGTH > REST. El running corto NO cambia el tipo. */
+export function resolverTipoDia({ socialPlaneada = false, fuerzaPlaneadaOHecha = false }) {
+  if (socialPlaneada) return "SOCIAL";
+  if (fuerzaPlaneadaOHecha) return "STRENGTH";
+  return "REST";
+}
+
+/** Objetivo del día según fase y tipo. Fuera del cut, un solo objetivo. */
+export function objetivoDelDia({ fase, tipo, ajustes }) {
+  if (fase === "CUT" || fase === "PRE_CUT") {
+    const o = (ajustes?.objetivosDia || CUT.objetivosDia)[tipo] || CUT.objetivosDia.REST;
+    return { kcal: o.kcal, proteinaG: o.proteinaG, carbosG: o.carbosG, grasaG: o.grasaG, tipo, flexible: tipo === "SOCIAL" };
+  }
+  return { kcal: ajustes?.kcalObjetivo ?? CUT.kcal, proteinaG: ajustes?.proteinaG ?? CUT.proteinaG, carbosG: ajustes?.carbosG ?? null, grasaG: ajustes?.grasaG ?? CUT.grasaG, tipo: null, flexible: false };
+}
+
+/** Lunes de la semana de una fecha (semana lunes–domingo). */
+export function lunesDe(fecha) {
+  const d = new Date(fecha + "T12:00:00");
+  const dow = (d.getDay() + 6) % 7; // lunes = 0
+  return sumarDias(fecha, -dow);
+}
+
+/**
+ * §47, §57 · Presupuesto semanal: kcal consumidas en la semana en curso frente
+ * a la referencia (16.050) y frente a lo esperado por los tipos de día de los
+ * días ya registrados.
+ */
+export function semanaKcal(diario, hoy, ajustes, fase) {
+  const lunes = lunesDe(hoy);
+  const dias = diasEntreFechas(diario, lunes, hoy).filter(diaValido);
+  const consumido = dias.reduce((t, d) => t + Number(d.kcal), 0);
+  const esperado = dias.reduce((t, d) => t + objetivoDelDia({ fase, tipo: d.tipoDia || "REST", ajustes }).kcal, 0);
+  const referencia = fase === "CUT" || fase === "PRE_CUT" ? CUT.semanaReferenciaKcal : (ajustes?.kcalObjetivo ?? CUT.kcal) * 7;
+  const tipos = { REST: 0, STRENGTH: 0, SOCIAL: 0 };
+  for (const d of dias) tipos[d.tipoDia || "REST"]++;
+  return { lunes, diasRegistrados: dias.length, consumido, esperado, referencia, diferencia: consumido - esperado, tipos };
+}
 
 /** §28 · Un día es válido si tiene kcal y, si hubo comida social, se estimó. */
 export function diaValido(d) {
@@ -157,8 +198,17 @@ export function semaforoNutricional({ diasEnFase, adherencia7, tendencia, compar
  * §31 · Sugerencia de calorías. Nunca automática: devuelve qué haría un
  * entrenador prudente y por qué, y Jose decide.
  */
-export function sugerenciaKcal({ fase, diasDesdeCambio, adherencia7, comparables, tendencia, tendenciaPrevia, cinturaBaja, cinturaEstable, recuperacion, kgRef, hayRuido, fuerzaEstable }) {
+export function sugerenciaKcal({ fase, diasDesdeCambio, adherencia7, comparables, tendencia, tendenciaPrevia, cinturaBaja, cinturaEstable, recuperacion, kgRef, hayRuido, fuerzaEstable, kcalMinimaActual }) {
   if (fase !== "CUT" && fase !== "MINI_CUT") return { accion: "MANTENER", motivo: "Fuera de fase de definición no se ajusta con estas reglas." };
+  const base = sugerenciaKcalSinSuelo({ fase, diasDesdeCambio, adherencia7, comparables, tendencia, tendenciaPrevia, cinturaBaja, cinturaEstable, recuperacion, kgRef, hayRuido, fuerzaEstable });
+  // §31 (3.1) · FORJA no puede bajar sola de 2.150 kcal: si tocaría, revisión manual.
+  if (base.accion === "CONSIDERAR_MENOS" && kcalMinimaActual != null && kcalMinimaActual - 100 < CUT.sueloKcalAutomatico) {
+    return { accion: "MANUAL_REVIEW_REQUIRED", motivo: base.motivo + ` Pero el día más bajo ya está en ${kcalMinimaActual} kcal y el suelo es ${CUT.sueloKcalAutomatico}.`, mensaje: MENSAJES.sueloKcal };
+  }
+  return base;
+}
+
+function sugerenciaKcalSinSuelo({ fase, diasDesdeCambio, adherencia7, comparables, tendencia, tendenciaPrevia, cinturaBaja, cinturaEstable, recuperacion, kgRef, hayRuido, fuerzaEstable }) {
 
   const clase = clasificarTendencia(tendencia, kgRef);
   const clasePrev = clasificarTendencia(tendenciaPrevia, kgRef);

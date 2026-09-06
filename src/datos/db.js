@@ -43,9 +43,12 @@ export const AJUSTES_INICIALES = {
   faseDesde: null,
   finProvisional: CUT.finProvisional,
   avisoPreRevision: CUT.avisoPreRevision,
+  // En CUT mandan los objetivos por tipo de día; `kcalObjetivo` es la media
+  // de referencia (~2.293) y el objetivo único de las fases sin tipos de día.
+  objetivosDia: CUT.objetivosDia,
   kcalObjetivo: CUT.kcal,
   proteinaG: CUT.proteinaG,
-  carbosG: CUT.carbosG,
+  carbosG: CUT.objetivosDia.STRENGTH.carbosG,
   grasaG: CUT.grasaG,
   ultimoCambioKcal: CUT.inicio,
   decisionRevision: null,
@@ -75,4 +78,12 @@ export async function asegurarAjustes() {
   // Instalaciones de la primera publicación (5 sep 2026) guardaban un nivel
   // CaCo; el plan definitivo va por sesiones S1–S66 y arranca en S5.
   if (hay.sesionRunning == null) await db.ajustes.update(1, { sesionRunning: SESION_RUNNING_INICIAL });
+  // 3.1 (6 sep 2026): calorías por tipo de día. Las instalaciones 3.0 tenían
+  // 2.400/175/268/70 fijos; si Jose no ha tocado nada, pasan al plan nuevo.
+  if (!hay.objetivosDia) {
+    const sinTocar = !hay.faseManual && hay.kcalObjetivo === 2400;
+    await db.ajustes.update(1, sinTocar
+      ? { objetivosDia: CUT.objetivosDia, kcalObjetivo: CUT.kcal, proteinaG: CUT.proteinaG, carbosG: CUT.objetivosDia.STRENGTH.carbosG, grasaG: CUT.grasaG }
+      : { objetivosDia: CUT.objetivosDia });
+  }
 }

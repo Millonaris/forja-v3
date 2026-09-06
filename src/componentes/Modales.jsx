@@ -5,8 +5,8 @@
 
 import { useState } from "react";
 
-import { CUT, MENSAJES, PROTEINA_RANGO } from "../datos/config.js";
-import { cambiarKcal, empezarGanancia, empezarMiniCut, guardarCarrera, guardarCierre, guardarCintura, guardarPeso, guardarRecuperacion } from "../logica/acciones.js";
+import { CUT, MENSAJES, NOMBRE_TIPO_DIA, PROTEINA_RANGO, RESTAURANTE } from "../datos/config.js";
+import { cambiarKcal, cambiarObjetivosDia, empezarGanancia, empezarMiniCut, guardarCarrera, guardarCierre, guardarCintura, guardarPeso, guardarRecuperacion } from "../logica/acciones.js";
 import { fechaCorta } from "../logica/fechas.js";
 import { n0, n1 } from "../logica/formato.js";
 import { nutricionRunning, semaforoDolor } from "../logica/running.js";
@@ -79,36 +79,96 @@ export function ModalRecuperacion({ r, onCerrar, avisar }) {
 
 export function ModalCierre({ r, onCerrar, avisar }) {
   const d = r.nutricion.recHoy || {};
+  const social = r.enCut ? r.tipoDia === "SOCIAL" : !!d.comidaSocial;
   const [kcal, setKcal] = useState(d.kcal ?? "");
   const [p, setP] = useState(d.proteinaG ?? "");
   const [c, setC] = useState(d.carbosG ?? "");
   const [g, setG] = useState(d.grasaG ?? "");
   const [pasos, setPasos] = useState(d.pasos ?? "");
-  const [social, setSocial] = useState(!!d.comidaSocial);
-  const [estimada, setEstimada] = useState(!!d.comidaSocialEstimada);
   const [notas, setNotas] = useState(d.notas ?? "");
+  // Social (§45): lo de Fitia hasta el restaurante + estimación rápida del restaurante.
+  const [antes, setAntes] = useState(d.restauranteKcal != null && d.kcal != null ? d.kcal - d.restauranteKcal : d.kcal ?? "");
+  const [preset, setPreset] = useState(d.restaurantePreset ?? null);
+  const [bebidas, setBebidas] = useState(d.bebidas ?? {});
+  const [ayudas, setAyudas] = useState({});
+  const [ajuste, setAjuste] = useState(d.restauranteKcal != null && d.restaurantePreset ? null : null);
+  const [confianza, setConfianza] = useState(d.restauranteConfianza ?? "MEDIUM");
+  const [estimadaOk, setEstimadaOk] = useState(!!d.comidaSocialEstimada || social);
+  const kcalPreset = RESTAURANTE.presets.find((x) => x.id === preset)?.kcal ?? 0;
+  const kcalBebidas = RESTAURANTE.bebidas.reduce((t, b) => t + (bebidas[b.id] || 0) * b.kcal, 0);
+  const kcalAyudas = RESTAURANTE.ayudas.reduce((t, b) => t + (ayudas[b.id] || 0) * b.kcal, 0);
+  const restauranteCalculado = kcalPreset + kcalBebidas + kcalAyudas;
+  const restaurante = ajuste != null && ajuste !== "" ? Number(ajuste) : restauranteCalculado;
+  const totalSocial = (Number(antes) || 0) + restaurante;
+  const listo = social ? totalSocial > 0 : !!kcal;
+
   const guardar = async () => {
-    await guardarCierre({ fecha: r.hoy, kcal, proteinaG: p, carbosG: c, grasaG: g, pasos, comidaSocial: social, comidaSocialEstimada: estimada, notas });
-    avisar(social ? MENSAJES.comidaSocial : "Día cerrado. " + MENSAJES.totalDelDia);
+    if (social) {
+      await guardarCierre({ fecha: r.hoy, tipoDia: r.enCut ? r.tipoDia : null, kcal: totalSocial, proteinaG: p, carbosG: null, grasaG: null, pasos, comidaSocial: true, comidaSocialEstimada: true, restaurantePreset: preset, restauranteKcal: restaurante, restauranteConfianza: confianza, bebidas, notas });
+      avisar(MENSAJES.comidaSocial + " Mañana, día normal.");
+    } else {
+      await guardarCierre({ fecha: r.hoy, tipoDia: r.enCut ? r.tipoDia : null, kcal, proteinaG: p, carbosG: c, grasaG: g, pasos, comidaSocial: false, comidaSocialEstimada: false, notas });
+      avisar("Día cerrado. " + MENSAJES.totalDelDia);
+    }
     onCerrar();
   };
   const campo = (etiqueta, v, set, ph) => (
     <Campo etiqueta={etiqueta}><input className="input" type="number" inputMode="numeric" value={v} onChange={(e) => set(e.target.value)} placeholder={ph} /></Campo>
   );
+  const contador = (lista, estado, set) => (
+    <div className="columna" style={{ gap: 6 }}>
+      {lista.map((b) => (
+        <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div className="p13 crece" style={{ flex: 1 }}>{b.nombre} <span className="tenue">· {b.kcal} kcal</span></div>
+          <button type="button" className="btn btn-chip" style={{ width: 40, padding: 0 }} onClick={() => set({ ...estado, [b.id]: Math.max(0, (estado[b.id] || 0) - 1) })}>−</button>
+          <div className="t" style={{ width: 22, textAlign: "center", fontSize: 18 }}>{estado[b.id] || 0}</div>
+          <button type="button" className="btn btn-chip" style={{ width: 40, padding: 0 }} onClick={() => set({ ...estado, [b.id]: (estado[b.id] || 0) + 1 })}>+</button>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
-    <Hoja titulo="Cierre del día" sub={fechaCorta(r.hoy)} onCerrar={onCerrar} onGuardar={guardar} guardarDeshabilitado={!kcal}>
-      <div className="p13 medio">Copia el total del día de Fitia y los pasos del Garmin. Objetivo {n0(r.kcal)} kcal · {r.macros.p} P · {r.macros.c} C · {r.macros.g} G.</div>
-      {campo("Kcal totales", kcal, setKcal, String(r.kcal))}
-      <div className="rejilla-3">
-        {campo("Proteína g", p, setP, String(r.macros.p))}
-        {campo("Carbos g", c, setC, String(r.macros.c))}
-        {campo("Grasa g", g, setG, String(r.macros.g))}
-      </div>
-      {campo("Pasos del día", pasos, setPasos, "12800")}
-      <Check activo={social} onChange={(v) => { setSocial(v); if (!v) setEstimada(false); }}>Hubo comida social</Check>
-      {social ? <Check activo={estimada} onChange={setEstimada}>La he estimado razonablemente y está dentro del total</Check> : null}
+    <Hoja titulo="Cierre del día" sub={`${fechaCorta(r.hoy)}${r.enCut ? ` · ${NOMBRE_TIPO_DIA[r.tipoDia]}` : ""}`} onCerrar={onCerrar} onGuardar={guardar} guardarDeshabilitado={!listo}>
+      {social ? (
+        <>
+          <div className="p13 medio">Día social: objetivo {n0(r.kcal)} kcal y ~{r.macros.p} g de proteína; carbos y grasa flexibles. No existe “comida gratis”, pero tampoco castigo.</div>
+          {campo("Kcal de Fitia ANTES del restaurante", antes, setAntes, "1200")}
+          <Campo etiqueta="Restaurante · tamaño (si dudas, el superior)">
+            <div style={{ display: "flex", gap: 6 }}>
+              {RESTAURANTE.presets.map((x) => <button key={x.id} type="button" className={`btn btn-chip ${preset === x.id ? "activo" : ""}`} style={{ flex: 1 }} onClick={() => { setPreset(x.id); setAjuste(null); }}>{x.nombre} · {x.kcal}</button>)}
+            </div>
+          </Campo>
+          <Campo etiqueta="Bebidas">{contador(RESTAURANTE.bebidas, bebidas, setBebidas)}</Campo>
+          <details>
+            <summary className="etiqueta" style={{ cursor: "pointer" }}>Añadir por unidades (opcional)</summary>
+            <div style={{ marginTop: 8 }}>{contador(RESTAURANTE.ayudas, ayudas, setAyudas)}</div>
+          </details>
+          <div className="rejilla-2">
+            <Campo etiqueta="Restaurante estimado (editable)"><input className="input" type="number" inputMode="numeric" value={ajuste ?? restauranteCalculado} onChange={(e) => setAjuste(e.target.value)} /></Campo>
+            <Campo etiqueta="Confianza"><div style={{ display: "flex", gap: 4 }}>{RESTAURANTE.confianzas.map((x) => <button key={x.id} type="button" className={`btn btn-chip ${confianza === x.id ? "activo" : ""}`} style={{ flex: 1, padding: 0 }} onClick={() => setConfianza(x.id)}>{x.nombre}</button>)}</div></Campo>
+          </div>
+          <div className="num num-28 centro">{n0(totalSocial)} <span className="unidad">kcal del día</span></div>
+          <div className="rejilla-2">
+            {campo("Proteína g (opcional)", p, setP, String(r.macros.p))}
+            {campo("Pasos del día", pasos, setPasos, "10000")}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="p13 medio">Copia el total del día de Fitia y los pasos del Garmin. Objetivo {n0(r.kcal)} kcal · {r.macros.p} P · {r.macros.c} C · {r.macros.g} G.</div>
+          {campo("Kcal totales", kcal, setKcal, String(r.kcal))}
+          <div className="rejilla-3">
+            {campo("Proteína g", p, setP, String(r.macros.p))}
+            {campo("Carbos g", c, setC, String(r.macros.c))}
+            {campo("Grasa g", g, setG, String(r.macros.g))}
+          </div>
+          {campo("Pasos del día", pasos, setPasos, "10000")}
+          {r.enCut ? <div className="p12 tenue">¿Ha habido comida social? Marca el día como Social en HOY y vuelve a cerrar.</div> : null}
+        </>
+      )}
       <Campo etiqueta="Notas (opcional)"><textarea className="input texto" value={notas} onChange={(e) => setNotas(e.target.value)} placeholder="Molestias, sueño raro, viaje…" /></Campo>
-      <div className="p12 tenue">Proteína ~{PROTEINA_RANGO.min}–{PROTEINA_RANGO.max} g está bien. Sin ayuno punitivo ni cardio de castigo.</div>
+      <div className="p12 tenue">Proteína ~{PROTEINA_RANGO.min}–{PROTEINA_RANGO.max} g está bien. Sin ayuno punitivo ni cardio de castigo.{estimadaOk ? "" : ""}</div>
     </Hoja>
   );
 }
@@ -165,28 +225,45 @@ export function ModalCarrera({ r, onCerrar, avisar }) {
 }
 
 export function ModalKcal({ r, ajustes, onCerrar, avisar }) {
+  const o = ajustes.objetivosDia || CUT.objetivosDia;
+  const [rest, setRest] = useState(o.REST.kcal);
+  const [strength, setStrength] = useState(o.STRENGTH.kcal);
+  const [social, setSocial] = useState(o.SOCIAL.kcal);
   const [kcal, setKcal] = useState(ajustes.kcalObjetivo);
   const [p, setP] = useState(ajustes.proteinaG);
   const [g, setG] = useState(ajustes.grasaG);
   const [motivo, setMotivo] = useState("");
-  const c = Math.max(0, Math.round((Number(kcal) - Number(p) * 4 - Number(g) * 9) / 4));
-  const salto = Math.abs(Number(kcal) - ajustes.kcalObjetivo);
+  const carbos = (k) => Math.max(0, Math.round((Number(k) - Number(p) * 4 - Number(g) * 9) / 4));
+  const sug = r.nutricion.sugerencia;
+  const bajoSuelo = r.enCut && Math.min(rest, strength) < CUT.sueloKcalAutomatico;
+  const media = Math.round((rest * 2 + strength * 3 + social * 2) / 7);
   const guardar = async () => {
-    await cambiarKcal({ kcal, proteinaG: p, carbosG: c, grasaG: g, motivo });
-    avisar(`Objetivo actualizado: ${n0(kcal)} kcal.`);
+    if (r.enCut) { await cambiarObjetivosDia({ rest, strength, social, proteinaG: p, grasaG: g, motivo }); avisar(`Objetivos actualizados: ${n0(rest)} / ${n0(strength)} / ${n0(social)} kcal.`); }
+    else { await cambiarKcal({ kcal, proteinaG: p, carbosG: carbos(kcal), grasaG: g, motivo }); avisar(`Objetivo actualizado: ${n0(kcal)} kcal.`); }
     onCerrar();
   };
   return (
-    <Hoja titulo="Cambiar kcal" sub={`ahora ${n0(ajustes.kcalObjetivo)}`} onCerrar={onCerrar} onGuardar={guardar} guardarDeshabilitado={!kcal || Number(kcal) < 1200}>
-      <div className="p13 medio">Sugerencia de FORJA: <strong className="acento">{r.nutricion.sugerencia.accion.replace("_", " ")}</strong> · {r.nutricion.sugerencia.motivo}</div>
-      <Campo etiqueta="Kcal/día"><Stepper valor={kcal} onChange={setKcal} paso={50} min={1200} max={5000} formato={n0} /></Campo>
-      <div className="rejilla-3">
+    <Hoja titulo="Cambiar kcal" sub={r.enCut ? `media ${n0(media)}/día` : `ahora ${n0(ajustes.kcalObjetivo)}`} onCerrar={onCerrar} onGuardar={guardar} guardarDeshabilitado={r.enCut ? !(rest && strength && social) : !kcal || Number(kcal) < 1200}>
+      <div className="p13 medio">Sugerencia de FORJA: <strong className="acento">{sug.accion.replace(/_/g, " ")}</strong> · {sug.motivo}</div>
+      {r.enCut ? (
+        <>
+          <Campo etiqueta="Descanso · kcal"><Stepper valor={rest} onChange={setRest} paso={50} min={1500} max={4000} formato={n0} /></Campo>
+          <Campo etiqueta="Fuerza · kcal"><Stepper valor={strength} onChange={setStrength} paso={50} min={1500} max={4000} formato={n0} /></Campo>
+          <Campo etiqueta="Social · kcal"><Stepper valor={social} onChange={setSocial} paso={50} min={1500} max={4500} formato={n0} /></Campo>
+          <div className="p12 tenue">Semana estándar 2 descanso + 3 fuerza + 2 social = {n0(rest * 2 + strength * 3 + social * 2)} kcal (~{n0(media)}/día). Carbos: descanso {carbos(rest)} g · fuerza {carbos(strength)} g.</div>
+          {bajoSuelo ? <div className="caja acento p13"><strong>Por debajo de 2.150 kcal.</strong> {MENSAJES.sueloKcal} Si lo haces, es decisión tuya y queda en el historial.</div> : null}
+        </>
+      ) : (
+        <>
+          <Campo etiqueta="Kcal/día"><Stepper valor={kcal} onChange={setKcal} paso={50} min={1200} max={5000} formato={n0} /></Campo>
+          <div className="p12 tenue">Carbos resultantes: {carbos(kcal)} g.</div>
+        </>
+      )}
+      <div className="rejilla-2">
         <Campo etiqueta="Proteína g"><Stepper valor={p} onChange={setP} paso={5} min={100} max={300} /></Campo>
         <Campo etiqueta="Grasa g"><Stepper valor={g} onChange={setG} paso={5} min={40} max={150} /></Campo>
-        <Campo etiqueta="Carbos g"><div className="stepper"><div className="valor">{c}</div></div></Campo>
       </div>
       <Campo etiqueta="Motivo (queda en el historial)"><input className="input texto" value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="Ej.: 2 semanas plano con adherencia 90 %" /></Campo>
-      {salto > 150 ? <div className="caja acento p13">Salto de {n0(salto)} kcal: el plan habla de ajustes de 100–150. Tú decides.</div> : null}
       <div className="p12 tenue">Cambios de 100 en 100, mínimo 14 días entre cambios. El carbohidrato ajusta el resto.</div>
     </Hoja>
   );

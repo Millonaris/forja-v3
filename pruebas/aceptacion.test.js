@@ -11,7 +11,7 @@ import { PLAN_RUNNING, RUTINAS, SECUENCIA, sesionRunning, seriesTotales } from "
 import { sumarDias } from "../src/logica/fechas.js";
 import { avisoCut, faseActual, mantenimientoConfirmable, subestado } from "../src/logica/fase.js";
 import { senalesDeload, siguienteRutina } from "../src/logica/fuerza.js";
-import { adherencia, calcularTdee, diaValido, semaforoNutricional, sugerenciaKcal, tdeeDeducido } from "../src/logica/nutricion.js";
+import { adherencia, calcularTdee, diaValido, objetivoDelDia, resolverTipoDia, semaforoNutricional, semanaKcal, sugerenciaKcal, tdeeDeducido } from "../src/logica/nutricion.js";
 import { clasificarTendencia, media7, pesosValidos, tendenciaSemanal } from "../src/logica/peso.js";
 import { veredicto } from "../src/logica/progresion.js";
 import { calcularResumen } from "../src/logica/resumen.js";
@@ -107,8 +107,40 @@ test("§28 · día válido = kcal registradas y comida social estimada", () => {
 });
 
 /* ---------- §33–§34 · TDEE ---------- */
-test("§33 · 2.400 kcal con −0,50 kg/sem → ~2.950", () => {
+test("§33 · 2.300 kcal con −0,40 kg/sem → ~2.740 (y 2.400/−0,50 → 2.950)", () => {
+  assert.equal(Math.round(tdeeDeducido(2300, -0.4)), 2740);
   assert.equal(Math.round(tdeeDeducido(2400, -0.5)), 2950);
+});
+
+/* ---------- 3.1 · §3, §4, §4B · calorías por tipo de día ---------- */
+test("§4B · SOCIAL > STRENGTH > REST; el running corto no cambia el tipo", () => {
+  assert.equal(resolverTipoDia({ socialPlaneada: true, fuerzaPlaneadaOHecha: true }), "SOCIAL");
+  assert.equal(resolverTipoDia({ socialPlaneada: false, fuerzaPlaneadaOHecha: true }), "STRENGTH");
+  assert.equal(resolverTipoDia({}), "REST");
+  const rest = objetivoDelDia({ fase: "CUT", tipo: "REST", ajustes: null });
+  assert.deepEqual([rest.kcal, rest.proteinaG, rest.carbosG, rest.grasaG], [2150, 175, 216, 65]);
+  const str = objetivoDelDia({ fase: "CUT", tipo: "STRENGTH", ajustes: null });
+  assert.deepEqual([str.kcal, str.proteinaG, str.carbosG, str.grasaG], [2250, 175, 241, 65]);
+  const soc = objetivoDelDia({ fase: "CUT", tipo: "SOCIAL", ajustes: null });
+  assert.deepEqual([soc.kcal, soc.proteinaG, soc.carbosG, soc.flexible], [2500, 175, null, true]);
+  assert.equal(CUT.semanaReferenciaKcal, 2150 * 2 + 2250 * 3 + 2500 * 2);
+  assert.equal(objetivoDelDia({ fase: "MAINTENANCE", tipo: "SOCIAL", ajustes: { kcalObjetivo: 2740 } }).kcal, 2740);
+});
+
+test("§47, §57 · presupuesto semanal: consumido frente a esperado por tipos de día", () => {
+  const diario = [dia("2026-09-07", { kcal: 2150, tipoDia: "REST" }), dia("2026-09-08", { kcal: 2300, tipoDia: "STRENGTH" }), dia("2026-09-09", { kcal: 2600, tipoDia: "SOCIAL", comidaSocial: true, comidaSocialEstimada: true })];
+  const s = semanaKcal(diario, "2026-09-10", null, "CUT");
+  assert.equal(s.lunes, "2026-09-07");
+  assert.equal(s.diasRegistrados, 3);
+  assert.equal(s.consumido, 7050);
+  assert.equal(s.esperado, 2150 + 2250 + 2500);
+  assert.equal(s.referencia, 16050);
+});
+
+test("§31 (3.1) · FORJA no baja sola de 2.150 kcal: MANUAL_REVIEW_REQUIRED", () => {
+  const base = { fase: "CUT", diasDesdeCambio: 20, adherencia7: 0.9, comparables: true, recuperacion: {}, kgRef: 97, cinturaEstable: true, hayRuido: false, tendencia: 0.05, tendenciaPrevia: -0.05 };
+  assert.equal(sugerenciaKcal({ ...base, kcalMinimaActual: 2400 }).accion, "CONSIDERAR_MENOS");
+  assert.equal(sugerenciaKcal({ ...base, kcalMinimaActual: 2150 }).accion, "MANUAL_REVIEW_REQUIRED");
 });
 
 test("§34 · el TDEE deducido exige 21 días válidos, adherencia y peso fiable; si no, ESTIMATED", () => {
@@ -119,7 +151,7 @@ test("§34 · el TDEE deducido exige 21 días válidos, adherencia y peso fiable
   const muchos = semanaDe("2026-09-08", 28, (f, i) => dia(f, { kcal: 2400, pasos: 12800, pesoKg: 97.5 - i * 0.07, pesoConfianza: "normal" }));
   const t2 = calcularTdee(muchos, "2026-10-05", { ultimoCambioKcal: "2026-09-08" });
   assert.equal(t2.valido, true, t2.motivos.join(" | "));
-  assert.ok(t2.valor > 2850 && t2.valor < 3000, String(t2.valor));
+  assert.ok(t2.valor > 2850 && t2.valor < 3000, String(t2.valor)); // 2.400 kcal y −0,49 kg/sem
   assert.equal(t2.rango[1] - t2.rango[0], 300);
 });
 
@@ -205,7 +237,7 @@ test("§37 · la decisión A/C pasa a mantenimiento en el TDEE deducido; B extie
   assert.equal(b.parche.avisoPreRevision, "2026-12-14");
   const c = aplicarDecision("MAINTENANCE_THEN_SECOND_CUT", { ajustes, hoy: "2026-11-30", tdee: { valido: false } });
   assert.equal(c.parche.segundoBloquePendiente, true);
-  assert.ok(c.parche.kcalObjetivo >= 2850 && c.parche.kcalObjetivo <= 3000);
+  assert.ok(c.parche.kcalObjetivo >= 2650 && c.parche.kcalObjetivo <= 2800); // TDEE estimado 3.1
 });
 
 test("§39 · mantenimiento confirmable: ±0,20 kg/sem varias semanas + cintura estable + actividad comparable", () => {
@@ -230,8 +262,10 @@ test("§57 · el resumen arranca limpio, sin datos de prueba, y dice lo que toca
   assert.equal(r.fuerza.siguiente, "TORSO_A");
   assert.equal(r.running.sesion, 5);
   assert.equal(r.running.plan.codigo, "4×6");
-  assert.equal(r.kcal, 2400);
-  assert.deepEqual(r.macros, { p: 175, c: 268, g: 70 });
+  assert.equal(r.tipoDia, "REST");
+  assert.equal(r.kcal, 2150);
+  assert.deepEqual(r.macros, { p: 175, c: 216, g: 65 });
+  assert.equal(r.semana.referencia, 16050);
   assert.equal(r.peso.media7, null);
   assert.equal(r.nutricion.tdee.estado, "ESTIMATED");
   assert.equal(r.nutricion.semaforo.color, "AMARILLO");

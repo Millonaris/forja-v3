@@ -1,4 +1,4 @@
-# FORJA 3.0
+# FORJA 3.1
 
 App personal de Jose: hipertrofia en gimnasio, definición (cut), running CaCo
 0→20 km, postura, core y recuperación. PWA local-first instalada en su móvil
@@ -15,9 +15,9 @@ Android. **No es un producto**: un solo usuario, y se optimiza para él.
 
 ## Fuentes de verdad
 
-- `docs/FORJA_3_0_SOURCE_OF_TRUTH_TECNICO_2026-09-05.md` — MANDA. Lógica,
+- `docs/FORJA_3_1_SOURCE_OF_TRUTH_TECNICO_2026-09-06.md` — MANDA. Lógica,
   estados, reglas, cálculos y datos. No reinterpretar, no simplificar, no
-  inventar decisiones fisiológicas.
+  inventar decisiones fisiológicas. (El 3.0 del 5 sep queda como histórico.)
 - `docs/FORJA_3_0_REDISENO_Y_CONTENIDOS_2026-09-05.md` — contenidos y UX.
 - `Aplicación de Gym Industrial/` — el diseño exportado de Claude Design
   (`ForjaApp.dc.html` es el prototipo funcional; `FORJA 3.0.dc.html` el lienzo
@@ -62,8 +62,16 @@ Sin router: la navegación es estado en `App.jsx`.
    (no si costó demasiado, ni con dolor amarillo, ni congelado), nunca por
    calendario. 2/semana y nunca dos días seguidos.
 2. **FORJA nunca cambia kcal sola.** Sugiere (MANTENER / ESPERAR /
-   CONSIDERAR ±100–150) y Jose decide en PLAN → Cambiar kcal. Mínimo 14 días
-   entre cambios, adherencia ≥85 %, tendencias y no pesadas.
+   CONSIDERAR ±100–150 / MANUAL_REVIEW_REQUIRED) y Jose decide en PLAN →
+   Cambiar kcal. Mínimo 14 días entre cambios, adherencia ≥85 %, tendencias y
+   no pesadas. Suelo automático 2.150 kcal.
+2b. **En CUT las kcal van por TIPO DE DÍA** (3.1): REST 2.150 / STRENGTH
+   2.250 / SOCIAL 2.500 (P 175; en social C/G flexibles). SOCIAL > STRENGTH >
+   REST; el running corto no cambia el tipo. Semana de referencia 16.050 kcal.
+   Los chips de HOY guardan `socialPlaneada` / `fuerzaPlaneada` en el diario;
+   la fuerza hecha hoy cuenta como STRENGTH. Día social → registro rápido de
+   restaurante (presets 800/1.200/1.600, bebidas, confianza), y al día siguiente
+   plan normal: sin recortes.
 3. **Ninguna fase entra sola.** PRE_CUT→CUT es por fecha (8 sep 2026); todo
    lo demás (mantenimiento, ganancia, mini-cut, extender) lo decide Jose en la
    revisión (30 nov) o en PLAN. El aviso del 16 nov solo avisa.
