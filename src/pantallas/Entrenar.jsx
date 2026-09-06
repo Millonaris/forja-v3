@@ -225,47 +225,43 @@ export function Running({ r, ir, abrirModal, avisar }) {
   const run = r.running;
   const [ajustando, setAjustando] = useState(false);
   const [verPlan, setVerPlan] = useState(false);
+  const [verReglas, setVerReglas] = useState(false);
   const colorEstado = { PROGRESS: "verde", HOLD: "amarillo", YELLOW_PAIN: "amarillo", RED_PAIN: "rojo" }[run.estado];
   const pct = ((run.sesion - 1) / PLAN_RUNNING.length) * 100;
+  const largo = run.duracionMin >= 45;
   return (
     <>
       <Volver texto="Entrenar" onClick={() => ir("entrenar", "menu")} />
-      <div style={{ marginTop: -10 }}><div className="titulo-xl">Running</div><div className="p13 tenue">Hobby complementario · 2 sesiones/semana · nunca dos días seguidos · RPE 3–4 · sin HIIT ni sprints</div></div>
+      <div style={{ marginTop: -10 }}><div className="titulo-xl">Running</div><div className="p13 tenue">2 por semana · nunca dos días seguidos · fácil, pudiendo hablar</div></div>
       <Marco style={{ padding: 16 }}>
-        <div className="kicker">Sesión actual · Fase {run.fase.fase} · {run.fase.nombre}</div>
+        <div className="kicker">Fase {run.fase.fase} · {run.fase.nombre}</div>
         <div className="t" style={{ fontSize: 46, lineHeight: .95 }}>S{run.sesion} <span style={{ fontSize: 30, color: "var(--texto-medio)" }}>· {run.plan.codigo}</span></div>
         <div className="p14 medio">{run.plan.desc} · ~{run.duracionMin} min</div>
-        <div className="p13 tenue">{run.nota}</div>
-        <div className="p12 tenue">{run.nutricion}</div>
-        <Boton variante="primario" className="mediano" onClick={() => abrirModal("carrera")} style={{ marginTop: 8 }} disabled={run.estado === "RED_PAIN"}>{run.hechaHoy ? "Registrar otra sesión" : "Registrar sesión"}</Boton>
-        {run.estado === "RED_PAIN" ? <div className="p12 rojo centro">Última sesión en rojo: parar y valorar antes de correr.</div> : null}
+        {run.estado !== "PROGRESS" || (run.ultima && run.ultima.repetir && run.ultima.sesion === run.sesion) ? <div className="p13 acento">{run.nota}</div> : null}
+        {largo ? <div className="p12 tenue">{run.nutricion}</div> : null}
+        <Boton variante="primario" className="mediano" onClick={() => abrirModal("carrera")} style={{ marginTop: 8 }} disabled={run.estado === "RED_PAIN"}>{run.hechaHoy ? "Registrar otra sesión" : "Sesión hecha"}</Boton>
       </Marco>
       <div>
         <div className="barra"><div className="relleno" style={{ width: `${pct}%` }} /></div>
-        <div className="entre etiqueta" style={{ marginTop: 6 }}><span>S{run.sesion} de {PLAN_RUNNING.length}</span><span>meta de fase: {run.fase.meta}</span></div>
-        <div className="p12 tenue" style={{ marginTop: 4 }}>Quedan {run.restante.quedan} sesiones · ~{run.restante.semanas} semanas a 2/semana, sin contar repeticiones. Si son más, no pasa nada.</div>
+        <div className="entre etiqueta" style={{ marginTop: 6 }}><span>S{run.sesion} de {PLAN_RUNNING.length}</span><span>{run.fase.meta}</span></div>
       </div>
       <div className="kicker tenue">Siguientes</div>
       <div className="lista">
         {run.siguientes.map((p) => <div key={p.n} className="fila" style={{ padding: "8px 0" }}><div className="t tenue" style={{ width: 40, fontSize: 16 }}>S{p.n}</div><div className="crece p13">{p.desc}</div><div className="num num-20">{p.codigo}</div></div>)}
       </div>
-      <div className="rejilla-3" style={{ gap: 8 }}>
-        <div style={{ borderTop: "3px solid var(--verde)", paddingTop: 8 }}><div className="t verde" style={{ fontSize: 16, textTransform: "uppercase", letterSpacing: ".06em" }}>Verde</div><div className="p12 medio">0–2/10, pasajero, normal al día siguiente.<br /><strong>Continuar.</strong></div></div>
-        <div style={{ borderTop: "3px solid var(--acento)", paddingTop: 8 }}><div className="t acento" style={{ fontSize: 16, textTransform: "uppercase", letterSpacing: ".06em" }}>Amarillo</div><div className="p12 medio">Localizado, recurrente o persiste.<br /><strong>No progresar.</strong></div></div>
-        <div style={{ borderTop: "3px solid var(--rojo)", paddingTop: 8 }}><div className="t rojo" style={{ fontSize: 16, textTransform: "uppercase", letterSpacing: ".06em" }}>Rojo</div><div className="p12 medio">Altera marcha, hinchazón, duele andando.<br /><strong>Parar y valorar.</strong></div></div>
-      </div>
       <div className="caja" style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div className={`punto ${colorEstado}`} />
-        <div className="p13 medio" style={{ flex: 1 }}><strong style={{ color: "var(--texto)" }}>{TEXTO_ESTADO_RUNNING[run.estado]}.</strong> {run.ultima ? `Última sesión ${fechaCorta(run.ultima.fecha)} · S${run.ultima.sesion ?? "?"} · ${run.semaforoUltima === "GREEN" ? "verde" : run.semaforoUltima === "YELLOW" ? "amarillo" : "rojo"}.` : "Sin sesiones en la 3.0. S3 y S4 ya estaban hechas."}</div>
+        <div className="p13 medio" style={{ flex: 1 }}><strong style={{ color: "var(--texto)" }}>{TEXTO_ESTADO_RUNNING[run.estado]}.</strong> {run.ultima ? `Última: ${fechaCorta(run.ultima.fecha)} · S${run.ultima.sesion ?? "?"} · ${run.semaforoUltima === "GREEN" ? "verde" : run.semaforoUltima === "YELLOW" ? "amarillo" : "rojo"}.` : "Sin sesiones en la 3.0 (S3 y S4 ya hechas)."}</div>
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <Boton variante="chip" className={run.estado === "HOLD" ? "activo" : ""} onClick={async () => { await fijarEstadoRunning(run.estado === "HOLD" ? "PROGRESS" : "HOLD"); avisar(run.estado === "HOLD" ? "Progresión abierta de nuevo." : MENSAJES.runningInterfiere); }}>{run.estado === "HOLD" ? "Abrir progresión" : "Congelar progresión"}</Boton>
+        <Boton variante="chip" className={run.estado === "HOLD" ? "activo" : ""} onClick={async () => { await fijarEstadoRunning(run.estado === "HOLD" ? "PROGRESS" : "HOLD"); avisar(run.estado === "HOLD" ? "Progresión abierta de nuevo." : MENSAJES.runningInterfiere); }}>{run.estado === "HOLD" ? "Abrir progresión" : "Congelar"}</Boton>
         <Boton variante="chip" onClick={() => setAjustando((v) => !v)}>Cambiar sesión</Boton>
-        <Boton variante="chip" onClick={() => setVerPlan((v) => !v)}>{verPlan ? "Ocultar plan" : "Ver plan completo"}</Boton>
+        <Boton variante="chip" onClick={() => setVerPlan((v) => !v)}>{verPlan ? "Ocultar plan" : "Plan completo"}</Boton>
+        <Boton variante="chip" onClick={() => setVerReglas((v) => !v)}>{verReglas ? "Ocultar reglas" : "Reglas"}</Boton>
       </div>
       {ajustando ? (
         <div className="caja columna">
-          <div className="p12 tenue">Sesión actual: S{run.sesion}. Solo para corregir; la progresión normal avanza sola con cada sesión en verde.</div>
+          <div className="p12 tenue">Solo para corregir: la progresión avanza sola con cada sesión en verde.</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <Boton variante="chip" onClick={async () => { await fijarSesionRunning(run.sesion - 1); avisar(`Sesión S${Math.max(1, run.sesion - 1)}.`); }} disabled={run.sesion <= 1}>← S{Math.max(1, run.sesion - 1)}</Boton>
             <div className="t" style={{ fontSize: 22, flex: 1, textAlign: "center" }}>S{run.sesion}</div>
@@ -273,12 +269,21 @@ export function Running({ r, ir, abrirModal, avisar }) {
           </div>
         </div>
       ) : null}
+      {verReglas ? (
+        <div className="columna">
+          <div className="rejilla-3" style={{ gap: 8 }}>
+            <div style={{ borderTop: "3px solid var(--verde)", paddingTop: 8 }}><div className="t verde" style={{ fontSize: 16, textTransform: "uppercase", letterSpacing: ".06em" }}>Verde</div><div className="p12 medio">Molestia pasajera, normal al día siguiente. <strong>Continuar.</strong></div></div>
+            <div style={{ borderTop: "3px solid var(--acento)", paddingTop: 8 }}><div className="t acento" style={{ fontSize: 16, textTransform: "uppercase", letterSpacing: ".06em" }}>Amarillo</div><div className="p12 medio">Localizado, recurrente o persiste. <strong>No progresar.</strong></div></div>
+            <div style={{ borderTop: "3px solid var(--rojo)", paddingTop: 8 }}><div className="t rojo" style={{ fontSize: 16, textTransform: "uppercase", letterSpacing: ".06em" }}>Rojo</div><div className="p12 medio">Altera marcha, hinchazón, duele andando. <strong>Parar y valorar.</strong></div></div>
+          </div>
+          <div className="p12 tenue">Se avanza una sesión por cada sesión en verde. Si cuesta demasiado, se repite. Si interfiere con Pierna A/B o la fuerza, se congela. Quedan {run.restante.quedan} sesiones (~{run.restante.semanas} semanas a 2/semana, sin contar repeticiones). {MENSAJES.running20k} Cuando las tiradas sean largas ya habremos salido del cut: FORJA adaptará carbohidratos, no te hará correr 18 km en déficit.</div>
+        </div>
+      ) : null}
       {verPlan ? (
         <div className="columna">
           {FASES_RUNNING.map((f) => (
             <div key={f.fase}>
               <div className="kicker tenue" style={{ marginBottom: 4 }}>Fase {f.fase} · {f.nombre}</div>
-              <div className="p12 tenue" style={{ marginBottom: 6 }}>{f.meta}</div>
               <div className="lista">
                 {PLAN_RUNNING.filter((p) => p.fase === f.fase).map((p) => (
                   <div key={p.n} className="fila" style={{ padding: "6px 0", background: p.n === run.sesion ? "var(--acento-suave)" : undefined, opacity: p.n < run.sesion ? .55 : 1 }}>
@@ -292,21 +297,24 @@ export function Running({ r, ir, abrirModal, avisar }) {
           ))}
         </div>
       ) : null}
-      <div className="kicker tenue">Últimas sesiones</div>
-      <div className="lista">
-        {run.lista.length ? run.lista.map((c) => {
-          const sem = semaforoDolor(c);
-          return (
-            <div key={c.id} className="fila">
-              <div className={`punto ${sem === "GREEN" ? "verde" : sem === "YELLOW" ? "amarillo" : "rojo"}`} style={{ width: 10, height: 10 }} />
-              <div className="p12 tenue" style={{ width: 52 }}>{fechaCorta(c.fecha)}</div>
-              <div className="crece"><div className="num num-20">{c.sesion ? `S${c.sesion} · ` : ""}{c.codigo}</div><div className="p12 tenue">{sem === "GREEN" ? "verde" : sem === "YELLOW" ? "amarillo" : "rojo"}{c.repetir ? " · repetir" : ""}{c.interfiere ? " · interfiere" : ""}{c.notas ? ` · ${c.notas}` : ""}</div></div>
-              <div className="der p12 medio">sens. {c.sensacion ?? "—"}/5</div>
-            </div>
-          );
-        }) : <div className="fila p13 tenue">Sin sesiones todavía en la 3.0. La primera será S{run.sesion} · {run.plan.codigo}.</div>}
-      </div>
-      <div className="p12 tenue">{MENSAJES.running20k} Cuando las tiradas sean largas (10–20 km) ya habremos salido del cut: FORJA adaptará carbohidratos, no te hará correr 18 km en déficit.</div>
+      {run.lista.length ? (
+        <>
+          <div className="kicker tenue">Últimas sesiones</div>
+          <div className="lista">
+            {run.lista.slice(0, 6).map((c) => {
+              const sem = semaforoDolor(c);
+              return (
+                <div key={c.id} className="fila">
+                  <div className={`punto ${sem === "GREEN" ? "verde" : sem === "YELLOW" ? "amarillo" : "rojo"}`} style={{ width: 10, height: 10 }} />
+                  <div className="p12 tenue" style={{ width: 52 }}>{fechaCorta(c.fecha)}</div>
+                  <div className="crece"><div className="num num-20">{c.sesion ? `S${c.sesion} · ` : ""}{c.codigo}</div>{c.repetir || c.interfiere || c.notas ? <div className="p12 tenue">{[c.repetir ? "repetir" : null, c.interfiere ? "interfiere" : null, c.notas || null].filter(Boolean).join(" · ")}</div> : null}</div>
+                  <div className="der p12 medio">sens. {c.sensacion ?? "—"}/5</div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      ) : null}
     </>
   );
 }
