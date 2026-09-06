@@ -9,7 +9,7 @@ import { MENSAJES } from "../datos/config.js";
 import { FASES_RUNNING, PLAN_RUNNING, RUTINAS, RUTINAS_CORTAS, SECUENCIA, seriesTotales } from "../datos/rutinas.js";
 import { actualizarSerie, cancelarSesion, completarRutinaCorta, empezarSesion, fijarEstadoRunning, fijarSesionRunning, finalizarSesion, guardarDescanso } from "../logica/acciones.js";
 import { fechaCorta, haceCuanto } from "../logica/fechas.js";
-import { mmss, n1, rango } from "../logica/formato.js";
+import { mmss, rango } from "../logica/formato.js";
 import { objetivoDeHoy, resumirSeries } from "../logica/progresion.js";
 import { TEXTO_ESTADO_RUNNING, semaforoDolor } from "../logica/running.js";
 import { useSesion } from "../ganchos/useDatos.js";
@@ -256,7 +256,7 @@ export function Running({ r, ir, abrirModal, avisar }) {
       </div>
       <div className="caja" style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div className={`punto ${colorEstado}`} />
-        <div className="p13 medio" style={{ flex: 1 }}><strong style={{ color: "var(--texto)" }}>{TEXTO_ESTADO_RUNNING[run.estado]}.</strong> {run.ultima ? `Última sesión ${fechaCorta(run.ultima.fecha)} · S${run.ultima.sesion ?? "?"} · dolor ${run.ultima.dolor}/10.` : "Sin sesiones en la 3.0. S3 y S4 ya estaban hechas."}</div>
+        <div className="p13 medio" style={{ flex: 1 }}><strong style={{ color: "var(--texto)" }}>{TEXTO_ESTADO_RUNNING[run.estado]}.</strong> {run.ultima ? `Última sesión ${fechaCorta(run.ultima.fecha)} · S${run.ultima.sesion ?? "?"} · ${run.semaforoUltima === "GREEN" ? "verde" : run.semaforoUltima === "YELLOW" ? "amarillo" : "rojo"}.` : "Sin sesiones en la 3.0. S3 y S4 ya estaban hechas."}</div>
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <Boton variante="chip" className={run.estado === "HOLD" ? "activo" : ""} onClick={async () => { await fijarEstadoRunning(run.estado === "HOLD" ? "PROGRESS" : "HOLD"); avisar(run.estado === "HOLD" ? "Progresión abierta de nuevo." : MENSAJES.runningInterfiere); }}>{run.estado === "HOLD" ? "Abrir progresión" : "Congelar progresión"}</Boton>
@@ -300,8 +300,8 @@ export function Running({ r, ir, abrirModal, avisar }) {
             <div key={c.id} className="fila">
               <div className={`punto ${sem === "GREEN" ? "verde" : sem === "YELLOW" ? "amarillo" : "rojo"}`} style={{ width: 10, height: 10 }} />
               <div className="p12 tenue" style={{ width: 52 }}>{fechaCorta(c.fecha)}</div>
-              <div className="crece"><div className="num num-20">{c.sesion ? `S${c.sesion} · ` : ""}{c.codigo}</div><div className="p12 tenue">{c.correrMin} min corriendo · {c.andarMin} andando{c.distanciaKm ? ` · ${n1(c.distanciaKm)} km` : ""}{c.repetir ? " · repetir" : ""}{c.interfiere ? " · interfiere" : ""}</div></div>
-              <div className="der p12 medio">FC {c.fcMedia ?? "—"}<br />dolor {c.dolor}/10</div>
+              <div className="crece"><div className="num num-20">{c.sesion ? `S${c.sesion} · ` : ""}{c.codigo}</div><div className="p12 tenue">{sem === "GREEN" ? "verde" : sem === "YELLOW" ? "amarillo" : "rojo"}{c.repetir ? " · repetir" : ""}{c.interfiere ? " · interfiere" : ""}{c.notas ? ` · ${c.notas}` : ""}</div></div>
+              <div className="der p12 medio">sens. {c.sensacion ?? "—"}/5</div>
             </div>
           );
         }) : <div className="fila p13 tenue">Sin sesiones todavía en la 3.0. La primera será S{run.sesion} · {run.plan.codigo}.</div>}

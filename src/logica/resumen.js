@@ -112,7 +112,7 @@ export function calcularResumen({ hoy, ajustes, diario = [], cintura = [], sesio
     recomendacion: recomendacionHoy({ estado: estadoRun, carreras, hoy, fuerzaHoy }),
     lista: ordenadas.slice(0, 12),
     porSemana4: carreras.filter((c) => diasEntre(c.fecha, hoy) < 28 && diasEntre(c.fecha, hoy) >= 0).length / 4,
-    fcMedia: ordenadas.slice(0, 5).filter((c) => c.fcMedia).length ? Math.round(ordenadas.slice(0, 5).filter((c) => c.fcMedia).reduce((t, c) => t + Number(c.fcMedia), 0) / ordenadas.slice(0, 5).filter((c) => c.fcMedia).length) : null,
+    sensacionMedia: (() => { const con = ordenadas.slice(0, 5).filter((c) => c.sensacion != null); return con.length ? con.reduce((t, c) => t + Number(c.sensacion), 0) / con.length : null; })(),
   };
 
   /* ---- tipo de día y objetivo de hoy (§4B, 3.1) ---- */
