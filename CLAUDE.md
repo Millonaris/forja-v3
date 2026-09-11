@@ -81,6 +81,9 @@ Sin router: la navegación es estado en `App.jsx`.
    pasos.
 6. **Descarga solo sugerida** con ≥2 señales, nunca ejecutada.
 7. **Fechas**: siempre "YYYY-MM-DD" local vía `logica/fechas.js`.
+8b. **Rutina ajustada por Jose el 11 sep 2026** (manda sobre el §7–§10 del
+   documento): press inclinado 4 series, pec deck 3, curl femoral 4 en Pierna A
+   y Pierna B. Totales 22 / 24 / 22 / 22.
 8. **Ids de ejercicio estables**: `RUTINA:clave` (p. ej. `TORSO_A:jalon-pecho-prono`);
    el historial se agrupa por `clave` porque el mismo ejercicio sale en varias rutinas.
 

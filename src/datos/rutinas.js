@@ -27,7 +27,7 @@ export const RUTINAS = {
       ej("jalon-pecho-prono", "Jalón al pecho prono", 3, "8-12", 120),
       ej("remo-sentado-bajo", "Remo sentado máquina agarre bajo", 3, "8-12", 120, "sesgo dorsal"),
       ej("elevaciones-laterales", "Elevaciones laterales", 4, "12-20", 75),
-      ej("press-inclinado", "Press inclinado máquina", 3, "8-12", 150),
+      ej("press-inclinado", "Press inclinado máquina", 4, "8-12", 150),
       ej("reverse-pec-deck", "Reverse pec deck", 2, "12-20", 75),
       ej("press-hombro", "Press hombro máquina", 2, "8-12", 120),
       ej("curl-biceps", "Curl bíceps", 2, "10-15", 90),
@@ -45,7 +45,7 @@ export const RUTINAS = {
       ej("hack-squat", "Hack squat", 3, "8-12", 150),
       ej("hip-thrust", "Hip thrust", 3, "8-12", 120),
       ej("prensa", "Prensa", 2, "10-15", 120),
-      ej("curl-femoral-sentado", "Curl femoral sentado", 3, "10-15", 90),
+      ej("curl-femoral-sentado", "Curl femoral sentado", 4, "10-15", 90),
       ej("extension-cuadriceps", "Extensión cuádriceps", 2, "10-15", 75, null, "A"),
       ej("elevaciones-laterales", "Elevaciones laterales", 2, "12-20", 75, null, "A"),
       ej("gemelo-de-pie", "Gemelo de pie", 2, "10-20", 60, null, "B"),
@@ -67,7 +67,7 @@ export const RUTINAS = {
       ej("jalon-neutro", "Jalón neutro/medio", 3, "8-12", 120),
       ej("press-plano", "Press plano máquina", 3, "8-12", 150),
       ej("reverse-pec-deck", "Reverse pec deck", 2, "12-20", 75),
-      ej("pec-deck", "Pec deck", 2, "10-15", 90),
+      ej("pec-deck", "Pec deck", 3, "10-15", 90),
       ej("curl-biceps", "Curl bíceps", 2, "10-15", 90),
       ej("triceps-overhead", "Tríceps overhead cable", 2, "10-15", 90),
     ],
@@ -82,7 +82,7 @@ export const RUTINAS = {
     ejercicios: [
       ej("hip-thrust", "Hip thrust", 3, "8-12", 120),
       ej("prensa-gluteo", "Prensa sesgo glúteo", 3, "8-12", 150),
-      ej("curl-femoral", "Curl femoral", 3, "10-15", 90),
+      ej("curl-femoral", "Curl femoral", 4, "10-15", 90),
       ej("extension-lumbar-45", "Extensión lumbar 45° sesgo glúteo", 2, "10-15", 90),
       ej("abductora", "Abductora", 2, "15-25", 60, null, "A"),
       ej("elevaciones-laterales", "Elevaciones laterales", 2, "12-20", 60, null, "A"),
@@ -98,7 +98,7 @@ export function idEjercicio(rutinaId, clave) {
   return `${rutinaId}:${clave}`;
 }
 
-/** Series totales de una rutina (21 / 23 / 21 / 21). */
+/** Series totales de una rutina (22 / 24 / 22 / 22 desde el 11 sep 2026: +1 press inclinado, +1 pec deck, +1 curl femoral en ambas piernas). */
 export function seriesTotales(rutinaId) {
   return RUTINAS[rutinaId].ejercicios.reduce((t, e) => t + e.series, 0);
 }

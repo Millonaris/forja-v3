@@ -49,8 +49,12 @@ test("la secuencia avanza al completar y no se reinicia por calendario", () => {
   assert.equal(siguienteRutina(s), "TORSO_A");
 });
 
-test("series totales: 21 / 23 / 21 / 21", () => {
-  assert.deepEqual(SECUENCIA.map(seriesTotales), [21, 23, 21, 21]);
+test("series totales: 22 / 24 / 22 / 22 (ajuste de Jose del 11 sep 2026)", () => {
+  assert.deepEqual(SECUENCIA.map(seriesTotales), [22, 24, 22, 22]);
+  assert.equal(RUTINAS.TORSO_A.ejercicios.find((e) => e.clave === "press-inclinado").series, 4);
+  assert.equal(RUTINAS.TORSO_B.ejercicios.find((e) => e.clave === "pec-deck").series, 3);
+  assert.equal(RUTINAS.PIERNA_A.ejercicios.find((e) => e.clave === "curl-femoral-sentado").series, 4);
+  assert.equal(RUTINAS.PIERNA_B.ejercicios.find((e) => e.clave === "curl-femoral").series, 4);
   assert.equal(RUTINAS.TORSO_A.ejercicios[1].nombre, "Remo sentado máquina agarre bajo");
   assert.equal(RUTINAS.TORSO_B.ejercicios[1].nombre, "Remo sentado máquina agarre alto");
   for (const r of Object.values(RUTINAS)) for (const e of r.ejercicios) assert.equal(e.rir, "1-2");
